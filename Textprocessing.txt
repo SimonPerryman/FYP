@@ -1,0 +1,72 @@
+Normal POS_TAG: [('Suggest', 'NNP'), ('a', 'DT'), ('better', 'JJR'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('!', '.')]
+Normal Lemmatized: ['Suggest', 'a', 'good', 'film', 'for', 'me', '!']
+Normal POS_TAG Lemmatized: [('Suggest', 'VB'), ('a', 'DT'), ('good', 'JJ'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('!', '.')]
+Normal POS_TAG: [('suggest', 'VB'), ('a', 'DT'), ('better', 'JJR'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('!', '.')]
+Lower Lemmatized: ['suggest', 'a', 'good', 'film', 'for', 'me', '!']
+Lower POS_TAG Lemmatized: [('suggest', 'VB'), ('a', 'DT'), ('good', 'JJ'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('!', '.')]
+
+
+Normal POS_TAG: [('What', 'WP'), ('is', 'VBZ'), ('a', 'DT'), ('good', 'JJ'), ('film', 'NN'), ('to', 'TO'), ('watch', 'VB'), ('at', 'IN'), ('the', 'DT'), ('moment', 'NN')]
+Normal Lemmatized: ['What', 'be', 'a', 'good', 'film', 'to', 'watch', 'at', 'the', 'moment']
+Normal POS_TAG Lemmatized: [('What', 'WP'), ('be', 'VB'), ('a', 'DT'), ('good', 'JJ'), ('film', 'NN'), ('to', 'TO'), ('watch', 'VB'), ('at', 'IN'), ('the', 'DT'), ('moment', 'NN')]
+Normal POS_TAG: [('what', 'WP'), ('is', 'VBZ'), ('a', 'DT'), ('good', 'JJ'), ('film', 'NN'), ('to', 'TO'), ('watch', 'VB'), ('at', 'IN'), ('the', 'DT'), ('moment', 'NN')]
+Lower Lemmatized: ['what', 'be', 'a', 'good', 'film', 'to', 'watch', 'at', 'the', 'moment']
+Lower POS_TAG Lemmatized: [('what', 'WP'), ('be', 'VB'), ('a', 'DT'), ('good', 'JJ'), ('film', 'NN'), ('to', 'TO'), ('watch', 'VB'), ('at', 'IN'), ('the', 'DT'), ('moment', 'NN')]
+
+
+Normal POS_TAG: [('Give', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('Steven', 'NNP'), ('Spielberg', 'NNP'), ('movie', 'NN')]
+Normal Lemmatized: ['Give', 'me', 'a', 'Steven', 'Spielberg', 'movie']
+Normal POS_TAG Lemmatized: [('Give', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('Steven', 'NNP'), ('Spielberg', 'NNP'), ('movie', 'NN')]
+Normal POS_TAG: [('give', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('steven', 'JJ'), ('spielberg', 'NN'), ('movie', 'NN')]
+Lower Lemmatized: ['give', 'me', 'a', 'steven', 'spielberg', 'movie']
+Lower POS_TAG Lemmatized: [('give', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('steven', 'JJ'), ('spielberg', 'NN'), ('movie', 'NN')]
+
+
+Normal POS_TAG: [('Show', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('film', 'NN'), ('that', 'WDT'), ('steven', 'VBZ'), ('spielberg', 'RB'), ('directed', 'VBN'), ('that', 'IN'), ('i', 'NNS'), ('have', 'VBP'), ('not', 'RB'), ('seen', 'VBN'), ('yet', 'RB')]
+Normal Lemmatized: ['Show', 'me', 'a', 'film', 'that', 'steven', 'spielberg', 'direct', 'that', 'i', 'have', 'not', 'see', 'yet']
+Normal POS_TAG Lemmatized: [('Show', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('film', 'NN'), ('that', 'WDT'), ('steven', 'VBZ'), ('spielberg', 'JJR'), ('direct', 'JJ'), ('that', 'IN'), ('i', 'NN'), ('have', 'VBP'), ('not', 'RB'), ('see', 'VBN'), ('yet', 'RB')]
+Normal POS_TAG: [('show', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('film', 'NN'), ('that', 'WDT'), ('steven', 'VBZ'), ('spielberg', 'RB'), ('directed', 'VBN'), ('that', 'IN'), ('i', 'NNS'), ('have', 'VBP'), ('not', 'RB'), ('seen', 'VBN'), ('yet', 'RB')]
+Lower Lemmatized: ['show', 'me', 'a', 'film', 'that', 'steven', 'spielberg', 'direct', 'that', 'i', 'have', 'not', 'see', 'yet']
+Lower POS_TAG Lemmatized: [('show', 'VB'), ('me', 'PRP'), ('a', 'DT'), ('film', 'NN'), ('that', 'WDT'), ('steven', 'VBZ'), ('spielberg', 'JJR'), ('direct', 'JJ'), ('that', 'IN'), ('i', 'NN'), ('have', 'VBP'), ('not', 'RB'), ('see', 'VBN'), ('yet', 'RB')]
+
+
+Normal POS_TAG: [('any', 'DT'), ('film', 'NN')]
+Normal Lemmatized: ['any', 'film']
+Normal POS_TAG Lemmatized: [('any', 'DT'), ('film', 'NN')]
+Normal POS_TAG: [('any', 'DT'), ('film', 'NN')]
+Lower Lemmatized: ['any', 'film']
+Lower POS_TAG Lemmatized: [('any', 'DT'), ('film', 'NN')]
+
+
+Normal POS_TAG: [('film', 'NN')]
+Normal Lemmatized: ['film']
+Normal POS_TAG Lemmatized: [('film', 'NN')]
+Normal POS_TAG: [('film', 'NN')]
+Lower Lemmatized: ['film']
+Lower POS_TAG Lemmatized: [('film', 'NN')]
+
+
+Normal POS_TAG: [('please', 'NN'), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('a', 'DT'), ('comedy', 'NN')]
+Normal Lemmatized: ['please', 'can', 'you', 'suggest', 'a', 'comedy']
+Normal POS_TAG Lemmatized: [('please', 'NN'), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('a', 'DT'), ('comedy', 'NN')]
+Normal POS_TAG: [('please', 'NN'), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('a', 'DT'), ('comedy', 'NN')]
+Lower Lemmatized: ['please', 'can', 'you', 'suggest', 'a', 'comedy']
+Lower POS_TAG Lemmatized: [('please', 'NN'), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('a', 'DT'), ('comedy', 'NN')]
+
+
+Normal POS_TAG: [('Thanks', 'NNS'), ('for', 'IN'), ('that', 'DT'), (',', ','), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('another', 'DT'), ('film', 'NN')]
+Normal Lemmatized: ['Thanks', 'for', 'that', ',', 'can', 'you', 'suggest', 'another', 'film']
+Normal POS_TAG Lemmatized: [('Thanks', 'NNS'), ('for', 'IN'), ('that', 'DT'), (',', ','), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('another', 'DT'), ('film', 'NN')]
+Normal POS_TAG: [('thanks', 'NNS'), ('for', 'IN'), ('that', 'DT'), (',', ','), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('another', 'DT'), ('film', 'NN')]
+Lower Lemmatized: ['thanks', 'for', 'that', ',', 'can', 'you', 'suggest', 'another', 'film']
+Lower POS_TAG Lemmatized: [('thanks', 'NNS'), ('for', 'IN'), ('that', 'DT'), (',', ','), ('can', 'MD'), ('you', 'PRP'), ('suggest', 'VB'), ('another', 'DT'), ('film', 'NN')]
+
+
+Normal POS_TAG: [('I', 'PRP'), ("'ve", 'VBP'), ('seen', 'VBN'), ('that', 'IN'), ('one', 'CD'), ('before', 'IN'), ('.', '.'), ('Give', 'VB'), ('me', 'PRP'), ('another', 'DT'), ('suggestion', 'NN')]
+Normal Lemmatized: ['I', "'ve", 'see', 'that', 'one', 'before', '.', 'Give', 'me', 'another', 'suggestion']
+Normal POS_TAG Lemmatized: [('I', 'PRP'), ("'ve", 'VBP'), ('see', 'VB'), ('that', 'DT'), ('one', 'CD'), ('before', 'RB'), ('.', '.'), ('Give', 'VB'), ('me', 'PRP'), ('another', 'DT'), ('suggestion', 'NN')]
+Normal POS_TAG: [('i', 'NN'), ("'ve", 'VBP'), ('seen', 'VBN'), ('that', 'IN'), ('one', 'CD'), ('before', 'IN'), ('.', '.'), ('give', 'VB'), ('me', 'PRP'), ('another', 'DT'), ('suggestion', 'NN')]
+Lower Lemmatized: ['i', "'ve", 'see', 'that', 'one', 'before', '.', 'give', 'me', 'another', 'suggestion']
+Lower POS_TAG Lemmatized: [('i', 'JJ'), ("'ve", 'VBP'), ('see', 'VBP'), ('that', 'IN'), ('one', 'CD'), ('before', 'IN'), ('.', '.'), ('give', 'VB'), ('me', 'PRP'), ('another', 'DT'), ('suggestion', 'NN')]
+
+

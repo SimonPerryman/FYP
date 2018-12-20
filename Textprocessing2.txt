@@ -1,0 +1,8 @@
+Normal POS_TAG: [('Suggest', 'VB'), ('a', 'DT'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('quickly', 'RB'), ('!', '.')]
+Normal Lemmatized: ['Suggest', 'a', 'film', 'for', 'me', 'quickly', '!']
+Normal POS_TAG Lemmatized: [('Suggest', 'VB'), ('a', 'DT'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('quickly', 'RB'), ('!', '.')]
+Normal POS_TAG: [('suggest', 'VB'), ('a', 'DT'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('quickly', 'RB'), ('!', '.')]
+Lower Lemmatized: ['suggest', 'a', 'film', 'for', 'me', 'quickly', '!']
+Lower POS_TAG Lemmatized: [('suggest', 'VB'), ('a', 'DT'), ('film', 'NN'), ('for', 'IN'), ('me', 'PRP'), ('quickly', 'RB'), ('!', '.')]
+
+
