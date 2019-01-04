@@ -1,22 +1,17 @@
-import pymysql
 import time
 
-connection = pymysql.connect(host='localhost',
-                             user='root',
-                             password='5q%C270r$xi5cay*c21Gz^5Ss',
-                             db='filmio',
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
+from db_connection import connect
+from context import contexts
 
-
-def insertUser(UserID, FirstName, LastName, FavouriteGenre = 0,
-                SecondFavouriteGenre = 0, ThirdFavouriteGenre = 0):
+def insertUser(UserID, FirstName, LastName):
     try:
+        connection = connect()
+        currentTime = int(time.time())
         with connection.cursor() as cursor:
             cursor.execute("""INSERT INTO `users` (UserID, FirstName, LastName,
-            Created, FavouriteGenre, SecondFavouriteGenre, ThirdFavouriteGenre) VALUES
-            (%s, %s, %s, %s, %s, %s, %s)""", (UserID, FirstName, LastName, int(time.time()),
-            FavouriteGenre, SecondFavouriteGenre, ThirdFavouriteGenre))
+            Created, Context, LastMessage) VALUES
+            (%s, %s, %s, %s, %s, %s)""", (UserID, FirstName, LastName, currentTime,
+            contexts['InitialUserRegistration'], currentTime))
 
         connection.commit()
     except Exception as e:
@@ -24,30 +19,57 @@ def insertUser(UserID, FirstName, LastName, FavouriteGenre = 0,
     finally:
         connection.close()
 
-def updateFavouriteGenres(UserID, FavouriteGenre = 0,
-    SecondFavouriteGenre = 0, ThirdFavouriteGenre = 0):
+def getUser(UserID):
+    """
+    @Desription: Get User Information
+    @Parameter: UserID (Int)
+    """
     try:
+        connection = connect()
         with connection.cursor() as cursor:
-            if FavouriteGenre != 0:
-                cursor.execute("""UPDATE `users` SET FavouriteGenre = %s WHERE UserID = %s""", (FavouriteGenre, UserID))
-            if SecondFavouriteGenre != 0:
-                cursor.execute("""UPDATE `users` SET SecondFavouriteGenre = %s WHERE UserID = %s""", (SecondFavouriteGenre, UserID))
-            if ThirdFavouriteGenre != 0:
-                cursor.execute("""UPDATE `users` SET ThirdFavouriteGenre = %s WHERE UserID = %s""", (ThirdFavouriteGenre, UserID))
-
-        connection.commit()
+            cursor.execute("""SELECT * FROM `users` WHERE UserID = %s""", UserID)
+        #TODO insert logic to set this to be a class
+        return cursor.fetchone()
     except Exception as e:
-        print("Error updating favourite user genres", str(e))
+        print("Error getting user info: ", str(e))
     finally:
         connection.close()
 
-def getUser(UserID):
+def updateUserAge(UserID, Age):
     try:
+        connection = connect()
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM `users` WHERE UserID = %s""", UserID)
+            cursor.execute("""UPDATE `users` SET Age = %s WHERE UserID = %s""", (Age, UserID))
 
-        return cursor.fetchone()
+        connection.commit()
     except Exception as e:
-        print("Error updating favourite user genres", str(e))
+        print("Error updating user age: ", str(e))
+    finally:
+        connection.close()
+
+def setUserContext(UserID, Context):
+    if Context in contexts:
+        try:
+            connection = connect()
+            with connection.cursor() as cursor:
+                cursor.execute("""UPDATE `users` SET Context = %s WHERE UserID = %s""", (Context, UserID))
+
+            connection.commit()
+        except Exception as e:
+            print("Error updating user context: ", str(e))
+        finally:
+            connection.close()
+    else:
+        return False    
+
+def setLastMessage(UserID, LastMessage):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE `users` SET LastMessage = %s WHERE UserID = %s""", (LastMessage, UserID))
+
+        connection.commit()
+    except Exception as e:
+        print("Error updating user last message time: ", str(e))
     finally:
         connection.close()
