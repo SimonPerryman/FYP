@@ -1,7 +1,7 @@
 import time
 
-from db_connection import connect
-from context import contexts
+from .db_connection import connect
+from context import contexts, stages, getStage
 
 def insertUser(UserID, FirstName, LastName):
     try:
@@ -9,9 +9,9 @@ def insertUser(UserID, FirstName, LastName):
         currentTime = int(time.time())
         with connection.cursor() as cursor:
             cursor.execute("""INSERT INTO `users` (UserID, FirstName, LastName,
-            Created, Context, LastMessage) VALUES
-            (%s, %s, %s, %s, %s, %s)""", (UserID, FirstName, LastName, currentTime,
-            contexts['InitialUserRegistration'], currentTime))
+            Created, Context, Stage, LastMessage) VALUES
+            (%s, %s, %s, %s, %s, %s, %s)""", (UserID, FirstName, LastName, currentTime,
+            contexts['InitialUserRegistration'], stages['registrationStages']['FirstGenre'], currentTime))
 
         connection.commit()
     except Exception as e:
@@ -52,15 +52,34 @@ def setUserContext(UserID, Context):
         try:
             connection = connect()
             with connection.cursor() as cursor:
-                cursor.execute("""UPDATE `users` SET Context = %s WHERE UserID = %s""", (Context, UserID))
+                cursor.execute("""UPDATE `users` SET Context = %s WHERE UserID = %s""",
+                                (contexts[Context], UserID))
 
             connection.commit()
         except Exception as e:
-            print("Error updating user context: ", str(e))
+            print("Error updating user context:", str(e))
         finally:
             connection.close()
     else:
-        return False    
+        #TODO Handle this better
+        return False
+
+def setUserStage(UserID, Context, Stage):
+    # if Stage in stages:
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE `users` SET Stage = %s WHERE UserID = %s""",
+                            (Stage, UserID))
+        
+        connection.commit()
+    except Exception as e:
+        print("Error updating user contextual stage:", str(e))
+    finally:
+        connection.close()
+    # else:
+    #     #TODO Handle this better
+    #     return False
 
 def setLastMessage(UserID, LastMessage):
     try:

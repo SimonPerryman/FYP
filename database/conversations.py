@@ -48,5 +48,3 @@ def getSpecificUserConversation(UserID, ConversationID):
     }, {
         "Conversations.$.Conversation": 1
     })
-
-# newConversation("1231", )

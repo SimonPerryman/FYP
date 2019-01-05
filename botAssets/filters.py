@@ -1,10 +1,11 @@
 from telegram.ext import BaseFilter
-from inputs import greetings
+from .inputs import greetings
 
-class TestFilter(BaseFilter):
+class wipFilter(BaseFilter):
     def filter(self, message):
-        return 'test123' in message.text
+        return message.text.lower() == "test"
 
 class GreetingFilter(BaseFilter):
-    def fitler(self, message):
+    def filter(self, message):
         return message.text.lower() in greetings
+
