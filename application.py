@@ -1,47 +1,67 @@
+# Default Python Packages
 import logging
-from telegram.ext import Updater, CommandHandler, MessageHandler
+import random
+import time
+from configparser import ConfigParser
+
+# Third Party Libraries
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import telegram
-import database
+
+# Program Files
+from database import insertUser, newConversation
 import conversations
 import botAssets
 import commands
-from configparser import ConfigParser
-import random
-import time
+
+# Test File
+from lab import wip_function
 
 config = ConfigParser()
 config.read("./config/config.ini")
 
-logging.basicConfig(format=config.get("settings", "logging_format"), level=config.getint("settings", "logging_level"))
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=config.getint("settings", "logging_level"))
                     
 def start(bot, update):
-    database.insertUser(update.message.chat.id, update.message.chat.FirstName, update.message.chat.lastName)
-    database.newConversation(update.message.chat.id, {
+    insertUser(update.message.chat.id, update.message.chat.first_name, update.message.chat.last_name)
+    newConversation(update.message.chat.id, {
         "MessageID": random.randint(0, 99999999),
         "Message": update.message.text,
         "Timestamp": int(time.time())
     })
-    # genres = dbcall.getGenres()
-    custom_keyboard = [['genres'], ['Skip this for now!']]
-    reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True)
+    genres_keyboard = botAssets.genresKeyboard()
+    reply_markup = telegram.ReplyKeyboardMarkup(genres_keyboard)
     bot.send_message(chat_id=update.message.chat_id, 
-                    text="Custom Keyboard Test", 
+                    text="""Hey {}! Thanks for talking to me, I haven't spoken to anyone in a while! I'm really interested in films.
+                    My favourite genre is comedy, what's yours?""".format(update.message.chat.first_name), 
                     reply_markup=reply_markup)
-    # bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
 
 start_handler = CommandHandler('start', start)
 update_genre_handler = CommandHandler('ufg', commands.updateGenre, pass_args=True)
+greetings_handler = MessageHandler(botAssets.GreetingFilter(), conversations.greetings)
+wip_handler = MessageHandler(botAssets.wipFilter(), wip_function)
+conversation_handler = MessageHandler(Filters.text, conversations.conversation_handler)
+echo_handler = MessageHandler(Filters.text, conversations.echo)
 
 def main():
     updater = Updater(token=config.get("bot", "token"))
     dispatcher = updater.dispatcher
+
+    # WIP Functions Testing
+    dispatcher.add_handler(wip_handler)
+
+    # Commands
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(update_genre_handler)
-    # dispatcher.add_handler(echo_handler)
-    # dispatcher.add_handler(caps_handler)
-    # dispatcher.add_handler(keyboard_handler)
+    
+    # Strict Messages
+    dispatcher.add_handler(greetings_handler)
+
+    # Conversation Handler
+    dispatcher.add_handler(conversation_handler)
+    dispatcher.add_handler(echo_handler)
     updater.start_polling()
-    updater.idle()
+    # updater.idle()
     print("Started Bot")
 
 if __name__ == "__main__":
