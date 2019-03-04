@@ -4,5 +4,6 @@ from .conversations import (addToConversation, newConversation, getUserConversat
 from .genres import (getGenre, getAllAlternativeGenreNames, getGenreByAlternativeGenreName,
                     updateFavouriteGenres, getFavouriteGenres, getSpecificFavouriteGenre,
                     insertFavouriteGenres, getAllGenres)
+from .films import (getFilmByID, getAllFilms)
 
 # from .db_connection import connect

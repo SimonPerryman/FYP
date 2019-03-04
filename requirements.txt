@@ -1,3 +1,4 @@
 python-telegram-bot==11.1.0
 mysql-connection-python==8.0.13
 pymongo==3.7.2
+pandas==0.24.1

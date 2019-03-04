@@ -30,3 +30,15 @@ def getRole(RoleName):
         print("Error updating user age: ", str(e))
     finally:
         connection.close()
+
+def getWritersAndDirectors():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT FilmID, CrewID, Director FROM `filmwritersanddirectors`""")
+
+            return cursor.fetchall()
+    except Exception as e:
+        print("Error getting writers and directors", str(e))
+    finally:
+        connection.close()

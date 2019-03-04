@@ -1,4 +1,4 @@
-from .db_connection import connect
+from db_connection import connect
 
 def getGenre(GenreName):
     try:
@@ -149,9 +149,25 @@ def insertFavouriteGenres(UserID, FavouriteGenre=0,
 
 
 def getAllGenres():
-    connection = connect()
-    with connection.cursor() as cursor:
-        cursor.execute("""SELECT * FROM `genresList`""")
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM `genresList`""")
 
-        return cursor.fetchall()
-    connection.close()
+            return cursor.fetchall()
+    except Exception as e:
+        print("Error getting all genres", str(e))
+    finally:
+        connection.close()
+
+def getAllFilmGenres():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT FilmID, GenreID FROM `filmgenrelinked`""")
+
+            return cursor.fetchall()
+    except Exception as e:
+        print("Error getting all film genres", str(e))
+    finally:
+        connection.close()
