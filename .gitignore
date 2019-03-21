@@ -110,3 +110,6 @@ venv.bak/
 
 # VSCode Files
 .vscode/*
+
+# Pickle Files
+*.pickle

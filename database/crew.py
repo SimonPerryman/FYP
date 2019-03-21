@@ -42,3 +42,15 @@ def getWritersAndDirectors():
         print("Error getting writers and directors", str(e))
     finally:
         connection.close()
+
+def getKnownForTitlesTable():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT CrewID, KnownForTitle FROM `KnownForTitles`""")
+
+            return cursor.fetchall()
+    except Exception as e:
+        print("Error getting known for titles table", str(e))
+    finally:
+        connection.close()
