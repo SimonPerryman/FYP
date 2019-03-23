@@ -171,3 +171,17 @@ def getAllFilmGenres():
         print("Error getting all film genres", str(e))
     finally:
         connection.close()
+
+def getAllFilmsWithGenreNames():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT FilmID, Name FROM `filmgenrelinked`
+                              LEFT JOIN `genreslist` 
+                              ON filmgenrelinked.GenreID = genreslist.GenreID""")
+
+            return cursor.fetchall()
+    except Exception as e:
+        print("Error getting all films with their genre names", str(e))
+    finally:
+        connection.close()

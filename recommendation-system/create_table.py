@@ -13,41 +13,40 @@ import films
 import genres
 import crew
 import ratings
+import shared
 
 def check_film_table_exists():
-    if os.path.isfile('filmsTable.pickle'):
-        return True
-    return False
+    return os.path.isfile('filmsTable.pickle')
+
+def sanitise_genres(genres):
+    return [genre for genre in genres if genre != None]
 
 def remove_duplicate_crew_members(film):
     new_crew = [crew_member for crew_member in film['CrewID'] if crew_member not in film['Directors']]
     new_crew = [crew_member for crew_member in new_crew if crew_member not in film['Writers']]
     return new_crew
 
-# CANT DO YEAR UNLESS change to genre name
 def create_metadata(film):
-    genres = ' '.join(str(genreID) for genreID in film['GenreID'])
-    writers = ' '.join(film['Writers'])
-    directors = ' '.join(film['Directors'])
-    crew_members = ' '.join(film['CrewID'])
-    return '{} {} {} {}'.format(genres, writers, directors, crew_members)
+    genres = ' '.join(film['Genres'])
+    writers_and_directors = ' '.join(list(set(film['Writers'] + film['Directors'])))
+    # crew_members = ' '.join(film['CrewID'])
+    # return '{} {} {} {}'.format(genres, writers, directors, crew_members)
+    return '{} {}'.format(genres, writers_and_directors)
 
-# Change to three functions - get/create/check if already made
-def getFilmTable():
-
-    # If table exists return table
-    if check_film_table_exists():
-        return pd.read_pickle('filmsTable.pickle')
-    print('Table not found, creating new table.')
+def create_film_table():
     filmsTable = pd.DataFrame(films.getAllFilms(), columns=['FilmID', 'Title', 'isAdult', 'Year', 'RunTime'])
 
-    filmgenres = pd.DataFrame(genres.getAllFilmGenres(), columns=['FilmID', 'GenreID'])
-    filmgenres = filmgenres.groupby('FilmID').agg(lambda x: x.tolist())
+    filmgenres = pd.DataFrame(genres.getAllFilmsWithGenreNames(), columns=['FilmID', 'Name'])
+    filmgenres = filmgenres.rename(index=str, columns={'Name': 'Genres'})
+    
+    filmgenres = filmgenres.groupby('FilmID').agg(sanitise_genres)
     filmsTable = filmsTable.merge(filmgenres, on='FilmID')
+    print("Preprocessed films data")
 
     alternativefilmdata = pd.DataFrame(films.getAllNonOriginalAlternativeFilmTitles(), columns=['FilmID', 'AlternativeTitle', 'Region'])
     alternativefilmdata = alternativefilmdata.groupby('FilmID').agg(lambda x: x.tolist())
     filmsTable = filmsTable.merge(alternativefilmdata, on='FilmID')
+    print("Preprocessed alternative films data")
 
     WritersAndDirectors = crew.getWritersAndDirectors()
     Writers = []
@@ -69,14 +68,17 @@ def getFilmTable():
     WritersAndDirectors = Writers.merge(Directors, on='FilmID')
     WritersAndDirectors = WritersAndDirectors.rename(index=str, columns={"CrewID_x": "Writers", "CrewID_y": "Directors"})
     filmsTable = filmsTable.merge(WritersAndDirectors, on='FilmID')
+    print("Preprocessed writers and directors data")
 
     KnownForTitles = pd.DataFrame(crew.getKnownForTitlesTable(), columns=['CrewID', 'KnownForTitle'])
     KnownForTitles = KnownForTitles.rename(index=str, columns={"KnownForTitle": "FilmID"})
     KnownForTitles = KnownForTitles.groupby('FilmID').agg(lambda x: x.tolist())
     filmsTable = filmsTable.merge(KnownForTitles, on='FilmID')
+    print("Preprocessed known for titles/crew data data")
 
     # Remove duplicate crew members that are also directors/writers.
     filmsTable['CrewID'] = filmsTable.apply(remove_duplicate_crew_members, axis=1)
+    print("Removed duplicate crew members that are also directors or writers")
     
     ratingsTable = pd.DataFrame(ratings.getAllFilmRatings(), columns=['FilmID', 'Rating', 'NumberOfVotes'])
     ratingsTable[['Rating', 'NumberOfVotes']] = ratingsTable[['Rating', 'NumberOfVotes']].apply(pd.to_numeric)
@@ -89,15 +91,27 @@ def getFilmTable():
     ), axis=1)
     
     filmsTable = filmsTable.merge(ratingsTable, on='FilmID')
+    print("Preprocessed ratings data")
 
     filmsTable['metadata'] = filmsTable.apply(create_metadata, axis=1)
-    
+    print("Created metadata data")
+
     print("Saving filmsTable as pickle file")
     filmsTable.to_pickle('filmsTable.pickle')
     return filmsTable
+
+def getFilmTable():
+    if check_film_table_exists():
+        print('Table found, using pickle file')
+        return pd.read_pickle('filmsTable.pickle')
+    print('Table not found, creating new table.')
+    return create_film_table()
 
 def create_user_film_table():
     """
     Creating the user -> film table matrix
     """
     return True
+
+if __name__ == "__main__":
+    create_film_table()
