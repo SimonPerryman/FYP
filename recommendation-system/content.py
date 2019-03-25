@@ -5,87 +5,48 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+import os.path
+
 def get_highest_imdb_score():
     return getFilmTable().sort_values('imdb_score', ascending=False)
 
+def load_pickle(name):
+    pkl_file = open(name, 'rb')
+    loaded_file = pickle.load(pkl_file)
+    pkl_file.close()
+    return loaded_file
 
 def generate_cosine_sim(filmsTable=None):
     if filmsTable is None:
         filmsTable = getFilmTable()
 
-    # cv = CountVectorizer(stop_words='english')
-    # cv_matrix = cv.fit_transform(filmsTable['metadata'])
+    cv = CountVectorizer(stop_words='english')
+    cv_matrix = cv.fit_transform(filmsTable['metadata'])
+    return cosine_similarity(cv_matrix, cv_matrix)
 
-    # output = open('cv_matrix.pickle', 'wb')
+def sort_sim_scores(film_sim_scores):
+    return film_sim_scores[1]
 
-    # pickle.dump(cv_matrix, output)
-
-    # output.close()
-
-    # return cosine_similarity(cv_matrix, cv_matrix)
-    hv = HashingVectorizer()
-    hv_matrix = hv.fit_transform(filmsTable['metadata'])
-
-    output = open('hv_matrix.pickle', 'wb')
-
-    pickle.dump(hv_matrix, output)
-
-    output.close()
-
-    return cosine_similarity(hv_matrix, hv_matrix)
 
 def content_recommendation_system(FilmID, filmsTable=None):
-    # # REMOVE # if cosine_similarity is None:
-
 
     if filmsTable is None:
         filmsTable = getFilmTable()
-    
+        filmsTable = filmsTable[(filmsTable['imdb_score'] > 6.29)].reset_index(drop=True)
+
+    cosine_sim = generate_cosine_sim(filmsTable)
+
+    # Measure to make sure they enter a film that exists.
+    # If < 6.29 but requested, perhaps look at genres.
     filmIndex = int(filmsTable[(filmsTable['FilmID'] == FilmID)].index.values)
 
-    # if filmsTable[(filmsTable['FilmID'] == FilmID)].index.values == 1:
-    #     filmIndex = int(filmsTable[(filmsTable['FilmID'] == FilmID)].index.values)
-    # else:
-    #     filmIndex = None
+    film_sim_scores = list(enumerate(cosine_sim[filmIndex][1:]))
 
-    #Year RunTime Rating NumberOfVotes imdb_score
-    import numpy as np
+    film_sim_scores = sorted(film_sim_scores, key=sort_sim_scores, reverse=True)
 
-    filmsTable['Year'] = filmsTable['Year'].astype(np.float16)
-    filmsTable['RunTime'] = filmsTable['RunTime'].astype(np.float16)
-    filmsTable['Rating'] = filmsTable['Rating'].astype(np.float16)
-    filmsTable['NumberOfVotes'] = filmsTable['NumberOfVotes'].astype(np.int32)
-    filmsTable['imdb_score'] = filmsTable['imdb_score'].astype(np.float16)
+    most_similar_films_indices = [pairs[0] for pairs in film_sim_scores[:25]]
 
-    # cosine_similarity = generate_cosine_sim(filmsTable)
+    return filmsTable.iloc[most_similar_films_indices]
 
-    # similarity_scores = list(enumerate(cosine_similarity[filmIndex]))
-
-    # similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse = True)
-
-    # similarity_scores = similarity_scores[1:11]
-
-    # similar_film_indicies = [index[0] for index in similarity_scores]
-
-    # print(filmsTable['Title'].iloc[similar_film_indicies])
-
-    # query = int(filmsTable[(filmsTable['FilmID'] == FilmID)].index.values)
-	
-    return True
-
-# print(content_recommendation_system("tt0000630"))
-
-f1 = open('cv_matrix.pickle', 'rb')
-
-zg = pickle.load(f1)
-
-f1.close()
-print(zg)
-
-# print(cosine_similarity(zg, zg))
-# highestFilm = get_highest_imdb_score()
-
-# print(highestFilm.iloc[185603])
-
-# indices = pd.Series(filmsTable.index, index=filmsTable['Title']).drop_duplicates()
-# print(indices)
+if __name__ == '__main__':
+    print(content_recommendation_system("tt0002130"))

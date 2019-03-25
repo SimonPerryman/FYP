@@ -7,6 +7,7 @@ from sklearn.metrics.pairwise import paired_cosine_distances as pcd
 import numpy as np
 import math
 import pickle
+import gc
  
  
 data = [
@@ -66,7 +67,7 @@ def generate_cosine_sim_table(filmVectors):
         allFilmSimilarities.append(filmVectorSimilarities)
     return allFilmSimilarities
     
-f1 = open(r'C:\dev\projects\University\FYP\recommendation-system\cv_matrix.pickle', 'rb')
+f1 = open(r'C:\dev\projects\University\FYP\recommendation-system\hv_matrix.pickle', 'rb')
 
 cv_matrix = pickle.load(f1)
 
@@ -115,12 +116,43 @@ def load_matrix():
 # print(type(matrix))
 # print(cv_matrix.shape)
 
+from scipy.sparse import hstack
 def save_matricies():
+    obj = None
+    temp = None
     for split in range(0, max_split, 5000):
-        save_dense_matrix(cv_matrix[split:(split + 4999)].todense(), int(split / 5000) + 1)
-    save_dense_matrix(cv_matrix[max_split:cv_matrix.shape[0]].todense(), max_i)
+        print(split)
+        if obj is not None:
+            temp = obj
+        obj = cv_matrix[split:(split+4999)].todense()
+        if temp is not None:
+            hstack(obj, temp)
+        # save_dense_matrix(obj, int(split / 5000) + 1)
+        # del obj
+        # gc.collect()
+    # obj = cv_matrix[max_split:cv_matrix.shape[0]].todense()
+    # gc.collect()
+    # save_dense_matrix(obj, max_i)
 
-save_matricies()
+# save_matricies()
+
+a = cv_matrix[:6721].todense()
+
+output = open('cv_matrix_part_X.pickle', 'wb')
+
+pickle.dump(a, output)
+
+output.close()
+
+# b = cv_matrix[6721:13442].todense()
+
+# output = open('cv_matrix_part_Y.pickle', 'wb')
+
+# pickle.dump(b, output)
+
+# output.close()
+
+# save_dense_matrix()
 # matrix5000 = cv_matrix[:4999]
 # print(matrix5000)
 # print("------")
@@ -132,7 +164,6 @@ save_matricies()
 # print(type(cv_matrix))
 
 # from scipy.sparse.csc import csc_matrix
-# from scipy.sparse import hstack
 # m1 = load_dense_matrix('cv_matrix_part_1.pickle')
 # m2 = load_dense_matrix('cv_matrix_part_2.pickle')
 # print(hstack())
