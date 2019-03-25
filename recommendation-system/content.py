@@ -34,12 +34,6 @@ def generate_cosine_sim(filmsTable=None):
 
     return cosine_similarity(hv_matrix, hv_matrix)
 
-z = set()
-def calc(x):
-    a = x.split()
-    for b in a:
-        z.add(b)
-
 def content_recommendation_system(FilmID, filmsTable=None):
     # # REMOVE # if cosine_similarity is None:
 
@@ -64,8 +58,6 @@ def content_recommendation_system(FilmID, filmsTable=None):
     filmsTable['imdb_score'] = filmsTable['imdb_score'].astype(np.float16)
 
     # cosine_similarity = generate_cosine_sim(filmsTable)
-
-    ind = filmsTable['metadata'].apply(calc)
 
     # similarity_scores = list(enumerate(cosine_similarity[filmIndex]))
 
