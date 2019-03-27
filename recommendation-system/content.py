@@ -27,7 +27,6 @@ def generate_cosine_sim(filmsTable=None):
 def sort_sim_scores(film_sim_scores):
     return film_sim_scores[1]
 
-
 def content_recommendation_system(FilmID, filmsTable=None):
 
     if filmsTable is None:

@@ -14,7 +14,7 @@ def insertMultipleUserRatings(ratings):
   finally:
     connection.close()
 
-def userRatings(UserID):
+def getUserRatings(UserID):
   try:
     connection = connect()
     with connection.cursor() as cursor:
@@ -26,19 +26,26 @@ def userRatings(UserID):
   finally:
     connection.close()
 
-# ratings = [
-#   ["629604219", "tt0468569", 1, 4],
-#   ["629604219", "tt0372784", 1, 3],
-#   ["629604219", "tt4633694", 1, 5],
-#   ["629604219", "tt2250912", 1, 4],
-#   ["629604219", "tt4154756", 1, 4],
-#   ["629604219", "tt0111161", 1, 5],
-#   ["629604219", "tt0451079", 0, 1],
-#   ["629604219", "tt1013743", 0, 2],
-#   ["629604219", "tt0443453", 1, 3],
-#   ["629604219", "tt3513498", 1, 3],
-#   ["629604219", "tt1131729", 1, 2],
-# ]
+def getAllUserRatings():
+  try:
+    connection = connect()
+    with connection.cursor() as cursor:
+      cursor.execute("""SELECT * FROM `userRatings`""")
 
+      return cursor.fetchall()
+  except Exception as e:
+    print("Error fetching all user ratings for", str(e))
+  finally:
+    connection.close()
 
-# insertMultipleUserRatings(ratings)
+def getAllMlUserRatings():
+  try:
+    connection = connect()
+    with connection.cursor() as cursor:
+      cursor.execute("""SELECT * FROM `mlUserRatings`""")
+
+      return cursor.fetchall()
+  except Exception as e:
+    print("Error fetching all movie lens user ratings for", str(e))
+  finally:
+    connection.close()
