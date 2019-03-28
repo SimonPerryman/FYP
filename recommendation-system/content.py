@@ -1,5 +1,5 @@
 import pandas as pd
-import pickle
+from reco_shared import load_pickle
 from create_table import getFilmTable
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
@@ -9,12 +9,6 @@ import os.path
 
 def get_highest_imdb_score():
     return getFilmTable().sort_values('imdb_score', ascending=False)
-
-def load_pickle(name):
-    pkl_file = open(name, 'rb')
-    loaded_file = pickle.load(pkl_file)
-    pkl_file.close()
-    return loaded_file
 
 def generate_cosine_sim(filmsTable=None):
     if filmsTable is None:
@@ -27,11 +21,11 @@ def generate_cosine_sim(filmsTable=None):
 def sort_sim_scores(film_sim_scores):
     return film_sim_scores[1]
 
-def content_recommendation_system(FilmID, filmsTable=None):
+def content_recommender(FilmID, filmsTable=None):
 
     if filmsTable is None:
         filmsTable = getFilmTable()
-        filmsTable = filmsTable[(filmsTable['imdb_score'] > 6.29)].reset_index(drop=True)
+        filmsTable = filmsTable[(filmsTable['imdb_score'] > 6.29)]
 
     cosine_sim = generate_cosine_sim(filmsTable)
 
@@ -48,4 +42,4 @@ def content_recommendation_system(FilmID, filmsTable=None):
     return filmsTable.iloc[most_similar_films_indices]
 
 if __name__ == '__main__':
-    print(content_recommendation_system("tt0002130"))
+    print(content_recommender("tt0002130"))
