@@ -23,7 +23,7 @@ def choose_algorithm(dataset):
         return SVD()
     return KNNBasic()
 
-def build_recommender():
+def build_collaborative_recommender():
     userFilmRatings = userRatings.getAllUserRatings()
     MLFilmRatings = userRatings.getAllMlUserRatings()
     userFilmRatings.extend(MLFilmRatings)
@@ -33,22 +33,21 @@ def build_recommender():
     dataset = Dataset.load_from_df(userFilmRatings, reader)
     trainset = dataset.build_full_trainset()
     testset = trainset.build_anti_testset()
-
     algorithm = choose_algorithm(dataset)    
     algorithm.fit(trainset)
-    predictions = algorithm.test(testset)
-    save_pickle(predictions, 'collaborative.pkl')
-    return predictions
+    algorithm.test(testset)
+
+    save_pickle(algorithm, 'collaborative.pkl')
+    return algorithm
 
 def get_collaborative_recommender():
     return load_pickle('collaborative.pkl')
 
 def collaborative_recommender(userId):
     if os.path.isfile('collaborative.pkl'):
-        collaborative = get_collaborative_recommender()
+        return get_collaborative_recommender()
     else:
-        collaborative = build_recommender()
-    return [predictions for predictions in collaborative if predictions[0] == userId]
-
-if __name__ == "__main__":
-    collaborative_recommender(629604219)
+        return build_collaborative_recommender()
+    
+if __name__ == '__main__':
+    build_collaborative_recommender()

@@ -71,3 +71,4 @@ def insert_movie_lens_ratings(movie_ratings):
 
 if __name__ == "__main__":
   insert_movie_lens_ratings(construct_movie_lens_ratings())
+  

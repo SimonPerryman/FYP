@@ -2,7 +2,6 @@ import pandas as pd
 from reco_shared import load_pickle
 from create_table import getFilmTable
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 import os.path
@@ -21,11 +20,7 @@ def generate_cosine_sim(filmsTable=None):
 def sort_sim_scores(film_sim_scores):
     return film_sim_scores[1]
 
-def content_recommender(FilmID, filmsTable=None):
-
-    if filmsTable is None:
-        filmsTable = getFilmTable()
-        filmsTable = filmsTable[(filmsTable['imdb_score'] > 6.29)]
+def content_recommender(FilmID, filmsTable):
 
     cosine_sim = generate_cosine_sim(filmsTable)
 
@@ -40,6 +35,3 @@ def content_recommender(FilmID, filmsTable=None):
     most_similar_films_indices = [pairs[0] for pairs in film_sim_scores[:25]]
 
     return filmsTable.iloc[most_similar_films_indices]
-
-if __name__ == '__main__':
-    print(content_recommender("tt0002130"))

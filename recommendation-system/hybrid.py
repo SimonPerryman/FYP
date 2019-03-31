@@ -1,36 +1,41 @@
 from collaborative import collaborative_recommender
 from content import content_recommender
+from create_table import getFilmTable
+from random import shuffle
+import pandas as pd
 
-def hybrid_recommender(userId, filmID):
-    content_result = content_recommender(filmID)
-    # print(content_result[:5])
+def sort_pred_scores(film_pred_score):
+    return film_pred_score[1]
+
+def calculate_min_max(film_predictions):
+    maxScore = 0
+    minScore = 0
+    for film in film_predictions:
+        if maxScore < film[1]:
+            maxScore = film[1]
+        if minScore > film[1]:
+            minScore = film[1]
+    return maxScore, minScore
+
+def hybrid_recommender(userId, filmID, filmsTable=None):
+    if filmsTable is None:
+        filmsTable = getFilmTable()
+        filmsTable = filmsTable[(filmsTable['imdb_score'] > 6.29)].reset_index()
+    content_result = content_recommender(filmID, filmsTable)
     collaborative_result = collaborative_recommender(userId)
-    print(len(collaborative_recommender))
-    # print(collaborative_result[:5])
 
-    # for film in collaborative_result[:5]:
-    #     print(film[1])
-    #     print(type(film[1]))
-    #     # if film[1] in content_result['FilmID']:
-    #     #     print(film[1])
+    film_predictions = []
+    for FilmID in content_result['FilmID']:
+        film_predictions.append([FilmID, collaborative_result.predict(userId, FilmID).est])
+    film_predictions.sort(key=sort_pred_scores, reverse=True)
+    maxScore, minScore = calculate_min_max(film_predictions)
+    if maxScore == minScore:
+        shuffle(film_predictions)
 
-    # a = content_result['FilmID']
-    # for v in a:
-    #     print(v)
-    # print(content_result['FilmID'].values[0], type(content_result['FilmID'].values[0]))
-    # print(collaborative_result[0][1], type(collaborative_result[0][1]))
+    film_predictions_ids = pd.Series([film[0] for film in film_predictions[:10]])
 
-    for i in range(len(collaborative_result)):
-        if collaborative_result[i][1] == 'tt0005078':
-            print(i)
-    # collab = [film for film in collaborative_result if film[1] in content_result['FilmID'].values]
-    # print(collab)
-    # hybrid_result = [film]
-    # content_result['FilmID']
-    # print(collaborative_result[1][1])
-    # collaborative_result[1]
-    print("True")
-
+    suggestedFilms = filmsTable[(filmsTable['FilmID'].isin(film_predictions_ids))]
+    return suggestedFilms['Title']
 
 if __name__ == '__main__':
-    hybrid_recommender(629604219, "tt0002130")
+    print(hybrid_recommender(629604219, "tt5095030"))
