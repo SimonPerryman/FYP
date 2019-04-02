@@ -14,9 +14,6 @@ import conversations
 import botAssets
 import commands
 
-# Test File
-from lab import wip_function
-
 config = ConfigParser()
 config.read("./config/config.ini")
 
@@ -39,16 +36,12 @@ def start(bot, update):
 start_handler = CommandHandler('start', start)
 update_genre_handler = CommandHandler('ufg', commands.updateGenre, pass_args=True)
 greetings_handler = MessageHandler(botAssets.GreetingFilter(), conversations.greetings)
-wip_handler = MessageHandler(botAssets.wipFilter(), wip_function)
 conversation_handler = MessageHandler(Filters.text, conversations.conversation_handler)
 echo_handler = MessageHandler(Filters.text, conversations.echo)
 
 def main():
     updater = Updater(token=config.get("bot", "token"))
     dispatcher = updater.dispatcher
-
-    # WIP Functions Testing
-    dispatcher.add_handler(wip_handler)
 
     # Commands
     dispatcher.add_handler(start_handler)

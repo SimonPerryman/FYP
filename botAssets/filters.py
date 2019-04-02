@@ -8,4 +8,3 @@ class wipFilter(BaseFilter):
 class GreetingFilter(BaseFilter):
     def filter(self, message):
         return message.text.lower() in greetings
-

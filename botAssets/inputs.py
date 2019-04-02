@@ -5,5 +5,6 @@ greetings = [
     "sup",
     "whats up",
     "what is up",
-    "how you doing"
+    "how you doing",
+    "yo"
 ]

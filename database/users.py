@@ -50,30 +50,13 @@ def updateUserAge(UserID, Age):
     finally:
         connection.close()
 
-def setUserContext(UserID, Context):
-    if Context in contexts:
-        try:
-            connection = connect()
-            with connection.cursor() as cursor:
-                cursor.execute("""UPDATE `users` SET Context = %s WHERE UserID = %s""",
-                                (contexts[Context], UserID))
-
-            connection.commit()
-        except Exception as e:
-            print("Error updating user context:", str(e))
-        finally:
-            connection.close()
-    else:
-        #TODO Handle this better
-        return False
-
-def setUserStage(UserID, Context, Stage):
+def setUserContextAndStage(UserID, Context, Stage):
     # if Stage in stages:
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.execute("""UPDATE `users` SET Stage = %s WHERE UserID = %s""",
-                            (Stage, UserID))
+            cursor.execute("""UPDATE `users` SET Context = %s, Stage = %s WHERE UserID = %s""",
+                            (Context, Stage, UserID))
         
         connection.commit()
     except Exception as e:

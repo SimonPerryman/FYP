@@ -2,7 +2,9 @@
 # Previous Context
 contexts = {
     "Error": 0,
-    "InitialUserRegistration": 1
+    "InitialUserRegistration": 1,
+    "FilmSuggestion": 2,
+    "ChitChat": 3
 }
 
 stages = {
@@ -12,7 +14,12 @@ stages = {
         "SecondGenre": 2,
         "ThirdGenre": 3,
         "Age": 4
-    }
+    },
+    "filmSuggestion": {
+        
+    },
+    "ChitChat": 1,
+    "Error": 0
 }
 
 

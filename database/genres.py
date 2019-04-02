@@ -106,7 +106,6 @@ def getFavouriteGenres(UserID):
     finally:
         connection.close()
 
-
 def getSpecificFavouriteGenre(UserID, Position):
     try:
         if Position > 0 and Position < 4:
@@ -133,13 +132,13 @@ def insertFavouriteGenres(UserID, FavouriteGenre=0,
         with connection.cursor() as cursor:
             if FavouriteGenre != 0:
                 cursor.execute(
-                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 1)""", (FavouriteGenre, UserID))
+                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 1)""", (UserID, FavouriteGenre))
             if SecondFavouriteGenre != 0:
                 cursor.execute(
-                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 2)""", (SecondFavouriteGenre, UserID))
+                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 2)""", (UserID, SecondFavouriteGenre))
             if ThirdFavouriteGenre != 0:
                 cursor.execute(
-                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 3)""", (ThirdFavouriteGenre, UserID))
+                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 3)""", (UserID, ThirdFavouriteGenre))
 
         connection.commit()
     except Exception as e:

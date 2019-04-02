@@ -1,13 +1,25 @@
 from .chitchat import *
-from .films import *
 from .registration import registrationHandler
+from .film_suggestion import FilmSuggestionHandler
 from context import contexts
+import spacy
+nlp = spacy.load('en_core_web_lg')
 
 from database import getUser, getFavouriteGenres
 
+def identify_intent(message):
+    intent = 0
+
+    # Film Intent = 1
+    filmSuggestionExample = nlp(u'can you suggest a film for me to watch')
+    if filmSuggestionExample.similarity(nlp(u'{}'.format(message.lower()))) > 0.70:
+        intent = 1
+
+    return intent
+
 def conversation_handler(bot, update):
     userDetails = getUser(update.message.chat.id)
-
+    intent = identify_intent(update.message.text)
     class Person:
         def __init__(self):
             self.id = userDetails['UserID']
@@ -29,6 +41,8 @@ def conversation_handler(bot, update):
     User = Person()
     if User.context == contexts['InitialUserRegistration']:
         registrationHandler(bot, update, User)
+    elif User.context == contexts['FilmSuggestion'] or intent == 1:
+        FilmSuggestionHandler(bot, update, User)
   
 
 def echo(bot, update):
