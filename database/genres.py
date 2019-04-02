@@ -27,16 +27,28 @@ def insertGenre(genre):
         connection.close()
 
 
-def getAllAlternativeGenreNames(GenreID):
+def getAllAlternativeGenreNamesForGenre(GenreID):
     try:
         connection = connect()
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT * FROM `alternativeGenreNames` WHERE Genre_ID = %s", (GenreID))
-        return cursor.fetchone()
+        return cursor.fetchall()
     except Exception as e:
         print("Error getting all alternative names for genre ID: {}".format(
             GenreID), str(e))
+    finally:
+        connection.close()
+
+def getAllAlternativeGenreNames():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT AlternativeName, Name, genreslist.GenreID FROM `alternativeGenreNames` LEFT JOIN `genresList`
+                                ON genresList.GenreID = alternativeGenreNames.GenreID""")
+        return cursor.fetchall()
+    except Exception as e:
+        print("Error getting all alternative names", str(e))
     finally:
         connection.close()
 

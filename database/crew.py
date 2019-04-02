@@ -54,3 +54,15 @@ def getKnownForTitlesTable():
         print("Error getting known for titles table", str(e))
     finally:
         connection.close()
+
+def getAllCrewMembersNames():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT Name FROM `crew`""")
+
+            return cursor.fetchall()
+    except Exception as e:
+        print("Error getting crew members names", str(e))
+    finally:
+        connection.close()
