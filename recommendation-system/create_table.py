@@ -114,4 +114,5 @@ def create_user_film_table():
     return True
 
 if __name__ == "__main__":
-    create_film_table()
+    print(getFilmTable().head())
+    # create_film_table()

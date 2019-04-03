@@ -23,15 +23,15 @@ def split_lists(list_to_split):
 def build_train_data(crew, key, example, start_index, entity_type):
     train_data = []
     for crew_member in crew:
-        train_data.append((example.format(crew_member['Name'].title()), {"entities": [start_index, start_index + len(crew_member), entity_type]}))
+        train_data.append((example.format(crew_member[key].title()), {"entities": [(start_index, start_index + len(crew_member), entity_type)]}))
     return train_data
 
 
 def get_train_data():
     train_data = []
 
-    crew1, crew2, crew3, crew4, crew5 = split_lists(getAllCrewMembersNames()[:10])
-    film1, film2, film3, film4, film5 = split_lists(getAllFilms()[:10])
+    crew1, crew2, crew3, crew4, crew5 = split_lists(getAllCrewMembersNames())
+    film1, film2, film3, film4, film5 = split_lists(getAllFilms())
 
     ExC1 = "It is a film with {} in it."
     ExC2 = "Have you seen the movie starring {} and {}."
@@ -48,10 +48,10 @@ def get_train_data():
 
     train_data = (build_train_data(crew1, 'Name', ExC1, 18, "PERSON"))
     for idx in range(0, len(crew2), 2):
-        train_data.append((ExC2.format(crew2[idx]['Name'], crew2[idx+1]['Name'], {"entities": [
+        train_data.append((ExC2.format(crew2[idx]['Name'].title(), crew2[idx+1]['Name'].title()), {"entities": [
             (33, 33 + len(crew2[idx]), "PERSON"),
             (38 + len(crew2[idx]), 38 + len(crew2[idx]) + len(crew2[idx+1]), "PERSON")
-        ]})))
+        ]}))
     train_data.extend(build_train_data(crew3, 'Name', ExC3, 52, "PERSON"))
     train_data.extend(build_train_data(crew4, 'Name', ExC4, 4, "PERSON"))
     train_data.extend(build_train_data(crew5, 'Name', ExC5, 8, "PERSON"))

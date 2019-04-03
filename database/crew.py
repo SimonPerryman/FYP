@@ -43,6 +43,19 @@ def getWritersAndDirectors():
     finally:
         connection.close()
 
+def getCrewBySimilarName(Name):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT CrewID, Name from `crew` WHERE Name LIKE %s""", (Name))
+
+            return cursor.fetchone()
+    except Exception as e:
+        print("Error getting crew id by similar name, with name {}".format(Name), str(e))
+    finally:
+        connection.close()
+        
+
 def getKnownForTitlesTable():
     try:
         connection = connect()
