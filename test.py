@@ -1,37 +1,39 @@
 import spacy
 nlp = spacy.load('en_core_web_lg')
-from database import getCrewBySimilarName
+# from database import getCrewBySimilarName, getAllFilms
+# import nltk
 # import sys
 # sys.path.insert(0, 'C:/dev/projects/University/FYP/recommendation-system/')
 # import pandas as pd
-import numpy as np
+# import numpy as np
 from spacy import displacy
+import re
 
 # from create_table import getFilmTable
 # from sklearn.feature_extraction.text import CountVectorizer
 
-def create_name(token):
-  name = []
-  for child in token.children:
-    if child.dep_ == "compound":
-      name.append(child.text)
-  name.append(token.text)
-  return " ".join(name)
+# def create_name(token):
+#   name = []
+#   for child in token.children:
+#     if child.dep_ == "compound":
+#       name.append(child.text)
+#   name.append(token.text)
+#   return " ".join(name)
 
-def calculate_average_vector(vectors):
-  result = np.zeros(vectors.shape[1])
-  for vector in vectors:
-    result = np.add(result, vector)
-  result = result / vectors.shape[0]
-  print(result)
-  return True
+# def calculate_average_vector(vectors):
+#   result = np.zeros(vectors.shape[1])
+#   for vector in vectors:
+#     result = np.add(result, vector)
+#   result = result / vectors.shape[0]
+#   print(result)
+#   return True
 
-def remove_stop_words(sentence):
-  doc = nlp(u'{}'.format(sentence))
-  # results = [(token, token.lemma_, token.pos_, token.tag_) for token in doc if not token.is_stop]
-  results = [str(token) for token in doc if not token.is_stop]
-  results = (' ').join(results)
-  return results
+# def remove_stop_words(sentence):
+#   doc = nlp(u'{}'.format(sentence))
+#   # results = [(token, token.lemma_, token.pos_, token.tag_) for token in doc if not token.is_stop]
+#   results = [str(token) for token in doc if not token.is_stop]
+#   results = (' ').join(results)
+#   return results
 
 # def find_actors_index(doc):
 #   for index, token in enumerate(doc):
@@ -45,6 +47,46 @@ def remove_stop_words(sentence):
 #     print("Test")
 
 def test():
+  doc = nlp(u"suggest a comedy with bruce willis similar to spiderman 2")
+  displacy.serve(doc, style="dep")
+  # comparison = nlp(u"antman")
+
+  # dbs = [
+  #   u"her elephant man",
+  #   u"the elephant man",
+  #   u"the wife of an important man",
+  #   u"mutant man",
+  #   u"the antman",
+  #   u"ant-man",
+  #   u"i am secretly an important man",
+  #   u"3 story: the secret history of the giant man",
+  #   u"elephant man of war",
+  #   u"malignant man",
+  #   u"an insignificant man",
+  #   u"ant-man and the wasp"
+  # ]
+
+  # for m in dbs:
+  #   m = re.sub(r"[^\s^\d^\w]", "", m).replace(" ", "")
+  #   doc = nlp(m)
+  #   print(doc, comparison.similarity(doc))
+  # for token in doc:
+  #   if token.text == "Hello":
+  #     message = message[token.idx + len(token) + 1:]
+
+  # print(message)
+
+  # Titles = [film['Title'] for film in getAllFilms()]
+  # doc = nlp(u"bright red apples on the tree")
+  # doc = nlp(u"the wizard of oz")
+  # for token in doc:
+  #   if token.dep_ == "ROOT":
+  #     right = [token.text for token in token.rights]
+  #     left = [token.text for token in token.lefts]
+  #     print('{} {} {}'.format(' '.join(left), token.text, ' '.join(right)))
+    # print(token)
+  # print([token.text for token in doc[0].rights])
+  # displacy.serve(doc, style="dep")
   # crew = ["Brad Pitt", "Ana Armas", "Ana armas", "John Film"]
   # crew_in_db = set()
   # crewPresent = True
@@ -69,34 +111,17 @@ def test():
 
   # doc = nlp( u'can you suggest a film similar to the Lord of the Rings and The Two Towers'.lower())
   # doc = nlp(u'The Hangover And Superman Which is a Comedy')
-  doc = nlp(u"The Lion The Witch And The Wardrobe")
+  # doc = nlp(u"The Lion The Witch And The Wardrobe")
 
-  displacy.serve(doc, style='dep')
+  # displacy.serve(doc, style='dep')
   # rs = [token.text for token in doc if not token.is_stop]
   # rs = ' '.join(rs)
   # doc = nlp(u'{}'.format(rs))
   # doc = nlp(u'Shrek')
   # for ent in doc.ents:
   #   print(ent, ent.label_)
-  # for token in doc:
-    # if token.text == "to":
-      # for anc in token.ancestors:
-      #   if anc.text == "similar":
-      #     for ancAnc in anc.ancestors:
-      #       if ancAnc.text == "film":
-      #         print("Yeah")
-        # print(anc)
-      # position = token.i
-      # token_index_minus_one = doc[position - 1]
-      # token_index_minus_two = doc[position - 2]
-      # if token_index_minus_one.is_ancestor(token) and token_index_minus_one.text == "similar" and token_index_minus_two.is_ancestor(token_index_minus_one) and (token_index_minus_two.text == "film" or token_index_minus_two.text == "movie"):
-      #   print("yeet")
 
-  #   if token.text == "like":
-  #     position = token.i
-  #     previous_token = doc[position - 1]
-  #     if previous_token.is_ancestor(token) and (previous_token == "film" or previous_token == "movie"):
-  #       print("yote")
+
 
 
 

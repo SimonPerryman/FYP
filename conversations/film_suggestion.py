@@ -1,6 +1,51 @@
 import spacy
-from database import getAllGenres, getAllAlternativeGenreNames, getCrewBySimilarName, getFilmBySimilarName
+import re
+from database import getAllGenres, getAllAlternativeGenreNames, getCrewBySimilarName, getFilmBySimilarName, getFilmByProcessedName
 nlp = spacy.load('en_core_web_lg')
+
+def search_for_film_in_db(preprocessed_film_name):
+  db_query = getFilmByProcessedName(preprocessed_film_name)
+  if db_query:
+    return db_query
+  else:
+    db_query = getFilmBySimilarName(preprocessed_film_name)
+    if db_query:
+      return db_query
+  return {}
+
+def search_for_film_start(message):
+  accepted_film_synonyms = ["movie", "film", "something"]
+  doc = nlp(message)
+  genres = [genre['Name'] for genre in getAllGenres()]
+  index = 0
+  for token in doc:
+    if token.text == "to":
+      for anc in token.ancestors:
+        if anc.text == "similar":
+          for rec_anc in anc.ancestors:
+            if rec_anc.text in accepted_film_synonyms or rec_anc.text in genres:
+              index = token.idx + len(token) + 1
+              return index, message[index:]
+
+    if token.text == "like":
+      position = token.i
+      previous_token = doc[position - 1]
+      if previous_token.is_ancestor(token) and (previous_token.text in accepted_film_synonyms or previous_token.text in genres):
+        index = token.idx + len(token) + 1
+        return index, message[index:]
+
+  return 0, message
+
+def iterate_through_ngrams(message):
+  doc = nlp(u'{}'.format(message))
+  first_word_is_useful = doc[0].pos_ == "NOUN" or doc[0].pos_ == "PROPN"
+  for index in range(len(doc), 0, -1):
+    if index > 1 or first_word_is_useful:
+      preprocessed_film_name = re.sub(r"[^\s^\d^\w]", "", doc[:index].text).replace(" ", "")
+      db_query = search_for_film_in_db(preprocessed_film_name)
+      if db_query:
+        return db_query['Title']
+  return {}
 
 def create_name(token):
   name = []
@@ -14,7 +59,6 @@ def check_for_genres(message):
   docLower = nlp(u'{}'.format(message.lower()))
   genres = set()
   genresInfo = getAllGenres()
-
   for genre in genresInfo:
     for token in docLower:
       if token.text == genre['Name']:
@@ -62,6 +106,13 @@ def check_for_film(message):
     # Person as that includes fictional people, such as superman.
     if ent.label_ == "WORK OF ART" or ent.label_ == "PERSON" or ent.label_ == "PRODUCT" or ent.label_ == "ORG":
       film.add(ent.text)
+
+  film_present, message = search_for_film_start(message)
+  if film_present != 0:
+    db_query = iterate_through_ngrams(message)
+    if db_query:
+      film.add(db_query)
+
   return list(film)
 
 def FilmSuggestionHandler(bot, update, User):
@@ -85,9 +136,9 @@ def FilmSuggestionHandler(bot, update, User):
 
   if crew:
     for crew_member in crew:
-      db_search = getCrewBySimilarName(crew_member)
-      if db_search:
-        crew_in_db.add((db_search['CrewID'], db_search['Name']))
+      db_query = getCrewBySimilarName(crew_member)
+      if db_query:
+        crew_in_db.add((db_query['CrewID'], db_query['Name']))
     crew_in_db = list(crew_in_db)
     if len(crew_in_db) > 3:
       crew_in_db = crew_in_db[:3]
@@ -97,9 +148,11 @@ def FilmSuggestionHandler(bot, update, User):
 
   if film:
     for film_name in film:
-      db_search = getFilmBySimilarName(film_name)
-      if db_search:
-        film_in_db.add((db_search['FilmID'], db_search['Title']))
+      preprocessed_film_name = re.sub(r"[^\s^\d^\w]", "", film_name).replace(" ", "")
+      
+      db_query = search_for_film_in_db(preprocessed_film_name)
+      if db_query:
+        film_in_db.add((db_query['FilmID'], db_query['Title']))
     film_in_db = list(film_in_db)
     if len(film_in_db) > 3:
       film_in_db = film_in_db[:3]
@@ -107,6 +160,7 @@ def FilmSuggestionHandler(bot, update, User):
     if film_in_db:
       filmPresent = True
 
+  # Can get rid of XPresent
   # filmsTable = getFilmsTable()
   # filmsTable[]
 
