@@ -1,7 +1,7 @@
 import spacy
 nlp = spacy.load('en_core_web_lg')
 # from database import getCrewBySimilarName, getAllFilms
-# import nltk
+# from nltk.corpus import wordnet
 # import sys
 # sys.path.insert(0, 'C:/dev/projects/University/FYP/recommendation-system/')
 # import pandas as pd
@@ -47,8 +47,76 @@ import re
 #     print("Test")
 
 def test():
-  doc = nlp(u"suggest a comedy with bruce willis similar to spiderman 2")
-  displacy.serve(doc, style="dep")
+  word = []
+  doc = nlp(u"no")
+  doc2 = nlp(u"I don't want to")
+  doc3 = nlp(u"yes")
+  word.append([token.lemma_ for token in doc])
+  word.append([token.lemma_ for token in doc2])
+  word.append([token.lemma_ for token in doc if not token.is_stop])
+  word.append([token.lemma_ for token in doc2 if not token.is_stop])
+  print(word)
+  print(doc.similarity(doc2))
+  print(doc.similarity(doc3))
+  print(doc3.similarity(doc2))
+  # doc = nlp(u"yes but also add superman. yes but remove superman. yes but add superman and remove spiderman. yes but replace spiderman with superman")
+  # displacy.serve(doc, style="dep")
+  # print("Done")
+  # syns = wordnet.synsets("yes")
+  # for syn in syns:
+  #   print(syn.definition())
+  #   print(syn.examples())
+  #   for lemma in syn.lemmas():
+  #     print(lemma.name())
+  #   print("-----")
+
+  # syns2 = wordnet.synsets("sure")
+  # for syn in syns2:
+  #   print(syn.definition())
+  #   print(syn.examples())
+  #   for lemma in syn.lemmas():
+  #     print(lemma.name())
+  #   print("--")
+
+
+  # w1 = wordnet.synset('yes.n.01')
+  # w2 = wordnet.synset('sure.n.01')
+  # print(w1.wup_similarity(w2))
+
+  # print(nlp(u"yes").similarity(nlp(u"sure")))
+  # correct = [
+  #   u"Yes",
+  #   u"Yes all good",
+  #   u"That is correct",
+  #   u"Sure"
+  # ]
+
+  # incorrect = [
+  #   u"I changed my mind. I want a film like aquaman instead",
+  #   u"No",
+  #   u"That's really wrong"
+  # ]
+
+  # extra = [
+  #   u"Yes but also like superman"
+  # ]
+
+  # comparison = nlp(u"Yes")
+  # print("Correct")
+  # for c in correct:
+  #   print(comparison.similarity(nlp(c)))
+  # print("incorrect")
+  # for i in incorrect:
+  #   print(comparison.similarity(nlp(i)))
+  # print("extra")
+  # for e in extra:
+  #   print(comparison.similarity(nlp(e)))
+  # for x in range(len(messages)):
+  #   for y in range(len(messages)):
+  #     if x > y:
+  #       print(messages[x], "|", messages[y], "|", nlp(messages[x]).similarity(nlp(messages[y])))
+  # doc = nlp(u"suggest a comedy with bruce willis similar to spiderman 2")
+  # displacy.serve(nlp(messages[0]), style="dep")
   # comparison = nlp(u"antman")
 
   # dbs = [

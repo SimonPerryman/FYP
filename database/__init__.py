@@ -6,6 +6,5 @@ from .genres import (getGenre, getAllAlternativeGenreNames, getAllAlternativeGen
                     insertFavouriteGenres, getAllGenres)
 from .films import (getFilmByID, getFilmBySimilarName, getAllFilms, getFilmByProcessedName)
 from .crew import (getAllCrewMembersNames, getCrewBySimilarName)
-from .db_connection import connect
-
-# from .db_connection import connect
+from .filmQueryInfo import (insert_query_information, get_query_info, remove_query_info)
+from .context import *

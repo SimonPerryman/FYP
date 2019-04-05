@@ -10,7 +10,7 @@ from database import getUser, getFavouriteGenres
 def identify_intent(message):
     intent = 0
 
-    # Film Intent = 1
+    # Film Intent = 1 - Maybe gotta have here if they in filmSuggestion context - any stage bar 0/1?
     filmSuggestionExample = nlp(u'can you suggest a film for me to watch')
     if filmSuggestionExample.similarity(nlp(u'{}'.format(message.lower()))) > 0.70:
         intent = 1
