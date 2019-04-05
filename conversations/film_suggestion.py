@@ -73,7 +73,7 @@ def iterate_through_ngrams(message):
   first_word_is_useful = doc[0].pos_ == "NOUN" or doc[0].pos_ == "PROPN"
   for index in range(len(doc), 0, -1):
     if index > 1 or first_word_is_useful:
-      preprocessed_film_name = preprocess_film_name(doc[:index.text])
+      preprocessed_film_name = preprocess_film_name(doc[:index].text)
       db_query = search_for_film_in_db(preprocessed_film_name)
       if db_query:
         return db_query['Title']
@@ -146,7 +146,7 @@ def check_for_film(message):
   """Searches the message for a film title using Named Entity Recognition (NER)
   and checks for film titles using the n-gram iteration method.
   @param {String} message
-  returns {List} Film Titles
+  @returns {List} Film Titles
   """
   film = set()
   doc = nlp(u'{}'.format(message))
@@ -223,14 +223,14 @@ def extract_data(bot, message, User):
       
       db_query = search_for_film_in_db(preprocessed_film_name)
       if db_query:
-        film_in_db.add(db_query['FilmID'])
+        film_in_db.add((db_query['FilmID'], db_query['Title']))
     film_in_db = list(film_in_db)
 
     if film_in_db:
       if len(film_in_db) > 3:
         film_in_db = film_in_db[:3]
       for film in film_in_db:
-        insert_query_information(User.id, film, 1)
+        insert_query_information(User.id, film[0], 1)
       next_stage = 'ConfirmFilm'
   #
   
@@ -238,8 +238,8 @@ def extract_data(bot, message, User):
   if next_stage == 'AskFilm':
     bot.send_message(User.id, "Do you want the film I suggest to be similar to another film?")
   else:
-    films = format_query_info(film_in_db)
-    bot.send_message(User.id, "So you want a film similar to {}?".format(films))
+    filmTitles = format_query_info([film[1] for film in film_in_db])
+    bot.send_message(User.id, "So you want a film similar to {}?".format(filmTitles))
 
 def confirm_film_response(bot, message, User):
   """Stage 2 Response. Confirming the extracted film information was correct.

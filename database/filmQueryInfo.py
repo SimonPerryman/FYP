@@ -23,7 +23,7 @@ def get_query_info(UserID, Type=None):
             else:
                 cursor.execute("""SELECT Information from `filmSuggestionQueryInfo`
                                     WHERE UserID = %s""", (UserID))
-        return cursor.fetchall()
+        return [result['information'] for result in cursor.fetchall()]
     except Exception as e:
         print("Error getting film query info", str(e))
     finally:
