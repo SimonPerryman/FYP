@@ -1,5 +1,5 @@
 from db_connection import connect
-import re
+from shared import preprocess_string
 
 def insertFilmDB(Films):
     try:
@@ -19,7 +19,7 @@ def construct_films_data():
     Films = []
     with open(titlebasics, "r", encoding="utf8") as f1:
         for line in f1:
-            formatted = line.strip().lower().split('\t')
+            formatted = line.strip().split('\t')
             if formatted[1] == "movie":
                 if formatted[7] != "\\n":
                     formatted[7] = int(formatted[7])
@@ -29,9 +29,9 @@ def construct_films_data():
                     formatted[5] = int(formatted[5])
                 else:
                     formatted[5] = None
-                formatted.append(re.sub(r"[^\s^\d^\w]", "", formatted[2]).replace(" ", ""))
+                formatted.append(preprocess_string(formatted[2]))
                             # Film ID       #Title          #TitlePP        #isAdult    #Year           #runTime
-                Films.append((formatted[0], formatted[2], formatted[9], int(formatted[4]), formatted[5], formatted[7]))
+                Films.append((formatted[0].lower(), formatted[2], formatted[9], int(formatted[4]), formatted[5], formatted[7]))
     return Films
 if __name__ == "__main__":
     insertFilmDB(construct_films_data())

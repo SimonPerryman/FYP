@@ -47,18 +47,14 @@ import re
 #     print("Test")
 
 def test():
-  word = []
-  doc = nlp(u"no")
-  doc2 = nlp(u"I don't want to")
-  doc3 = nlp(u"yes")
-  word.append([token.lemma_ for token in doc])
-  word.append([token.lemma_ for token in doc2])
-  word.append([token.lemma_ for token in doc if not token.is_stop])
-  word.append([token.lemma_ for token in doc2 if not token.is_stop])
-  print(word)
-  print(doc.similarity(doc2))
-  print(doc.similarity(doc3))
-  print(doc3.similarity(doc2))
+  simple_responses = ["no", "yes", "maybe", "not sure"]
+  for s in simple_responses:
+    doc = nlp(u"{}".format(s))
+    for token in doc:
+      if token.is_stop:
+        print(token, "is stop")
+      else:
+        print(token, "isn't stop")
   # doc = nlp(u"yes but also add superman. yes but remove superman. yes but add superman and remove spiderman. yes but replace spiderman with superman")
   # displacy.serve(doc, style="dep")
   # print("Done")
