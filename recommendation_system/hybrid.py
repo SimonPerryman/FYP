@@ -73,9 +73,9 @@ def get_generated_requested_filmID(UserID):
         index = randint(0, len(user_ratings) - 1)
         requested_filmID = user_ratings[index]
 
-def build_tailored_films_table(UserID):
+def build_tailored_films_table(User):
     """Build a films table tailored to the user's requests
-    @param {Int} UserID
+    @param {Person} User
     @returns {DataFrame} filmsTable
     @returns {String} requested_filmID - film ID of requested film"""
     filmsTable = getFilmTable()
@@ -94,7 +94,7 @@ def build_tailored_films_table(UserID):
     
     # No Film Selected
     if not requested_filmID:
-        requested_filmID = get_generated_requested_filmID(UserID)
+        requested_filmID = get_generated_requested_filmID(User.id)
                   
     if not requested_genres:
         if User.favouriteGenre:
@@ -132,8 +132,8 @@ def build_tailored_films_table(UserID):
             )]
     
     
-    if filmsTable.shape[0] > 5000:
-        filmsTable = sort_by_highest_imdb_score(filmsTable)[:5000]
+    if filmsTable.shape[0] > 2000:
+        filmsTable = sort_by_highest_imdb_score(filmsTable)[:2000]
     filmsTable = filmsTable.reset_index(drop=True)
     return filmsTable, requested_filmID
 
@@ -144,7 +144,7 @@ def hybrid_recommender(User):
     similar films, then rank them in order of what it predicts the user will rate the films.
     @param {Person} User
     @returns {Series} Top 25 Film Titles and respective FilmIDs"""
-    filmsTable, requested_filmID = build_tailored_films_table(User.id)
+    filmsTable, requested_filmID = build_tailored_films_table(User)
    
     collaborative_result = collaborative_recommender(User.id)
     content_result = content_recommender(requested_filmID, filmsTable)

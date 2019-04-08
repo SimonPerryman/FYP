@@ -26,7 +26,6 @@ def create_metadata(film):
     writers_and_directors = ' '.join(list(set(film['Writers'] + film['Directors'])))
     crew_members = ' '.join(film['CrewID'])
     return '{} {} {}'.format(genres, writers_and_directors, crew_members)
-    # return '{} {}'.format(genres, writers_and_directors)
 
 def create_film_table():
     filmsTable = pd.DataFrame(db.getAllFilms(), columns=['FilmID', 'Title', 'isAdult', 'Year', 'RunTime'])
