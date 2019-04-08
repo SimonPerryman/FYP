@@ -1,1 +1,1 @@
-from .webscraper import get_imdb_film_poster
+from .webscraper import get_imdb_film_details

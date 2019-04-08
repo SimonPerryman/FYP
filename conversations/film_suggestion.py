@@ -6,7 +6,7 @@ from database import setUserContextAndStage, contexts, stages
 from recommendation_system import hybrid_recommender
 import sys
 sys.path.insert(0, 'C:/dev/projects/University/FYP/')
-from misc import get_imdb_film_poster
+from misc import get_imdb_film_details
 nlp = spacy.load('en_core_web_lg')
 
 def preprocess_text(film_name):
@@ -417,12 +417,14 @@ def confirm_crew_response(bot, message, User):
   if skip or yes.similarity(doc) > 0.8:
     suggested_films = hybrid_recommender(User)
     suggested_film = hybrid_recommender[0]
-    suggested_film_poster_url = get_imdb_film_poster(suggested_film[0]['FilmID'])
+    suggested_film_poster_url, suggested_film_plot = get_imdb_film_details(suggested_film[0]['FilmID'])
     db.updateSuggestedFilm(User.id, suggested_film['FilmID'])
     next_question_message = "I have found this film, which I think you will like: {}".format(suggested_film['Title'])
     bot.send_message(User.id, next_question_message)
     if suggested_film_poster_url:
       bot.send_photo(User.id, photo=suggested_film_poster_url)
+    if suggested_film_plot:
+      bot.send_message(User.id, "Here is the plot of the film:\n{}".format(suggested_film_plot))
     # Generate Poster of Film
     print("Get all details, generate film.")
   elif no.similarity(doc) > 0.8:
