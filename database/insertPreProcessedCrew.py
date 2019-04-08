@@ -8,8 +8,10 @@ def create_crew():
     with open(namebasics, "r", encoding="utf8") as f4:
         for line in f4:
             formatted = line.strip().split('\t')
+            if formatted[2] == "\\N":
+                formatted[2] = None
             if formatted[3] == "\\N":
-                formatted[3] = 0
+                formatted[3] = None
             formatted[4] = formatted[4].split(",")
             formatted[5] = formatted[5].split(",")
             formatted.append(preprocess_string(formatted[1]))
@@ -27,7 +29,7 @@ def insertCrewDB(Crew):
 
         connection.commit()
     except Exception as e:
-        print("Error inserting crewDB data for crew: {}, with error:".format(Crew[0]), str(e))
+        print("Error inserting crewDB data, with error:", str(e))
     finally:
         connection.close()
 

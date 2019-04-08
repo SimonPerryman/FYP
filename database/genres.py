@@ -109,8 +109,8 @@ def getFavouriteGenres(UserID):
         connection = connect()
         # Check does not already exist
         with connection.cursor() as cursor:
-            cursor.execute(
-                """SELECT `GenreID`, `Order` FROM favouriteGenres WHERE UserID = %s""", (UserID))
+            cursor.execute("""SELECT genreslist.GenreID, Name, FavouriteGenres.Order FROM FavouriteGenres
+            LEFT JOIN genresList ON favouriteGenres.GenreID = genresList.GenreID WHERE UserID = %s""", (UserID))
 
         return cursor.fetchall()
     except Exception as e:
@@ -196,3 +196,7 @@ def getAllFilmsWithGenreNames():
         print("Error getting all films with their genre names", str(e))
     finally:
         connection.close()
+
+
+if __name__ == "__main__":
+    print(getFavouriteGenres(629604219))

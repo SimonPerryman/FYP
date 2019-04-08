@@ -1,7 +1,12 @@
 import spacy
 import re
 import database as db
+import pandas as pd
 from database import setUserContextAndStage, contexts, stages
+from recommendation_system import hybrid_recommender
+import sys
+sys.path.insert(0, 'C:/dev/projects/University/FYP/')
+from misc import get_imdb_film_poster
 nlp = spacy.load('en_core_web_lg')
 
 def preprocess_text(film_name):
@@ -96,7 +101,7 @@ def check_for_genres(message):
   """
   docLower = nlp(u'{}'.format(message.lower()))
   genres = set()
-  genresInfo = getAllGenres()
+  genresInfo = db.getAllGenres()
   for genre in genresInfo:
     for token in docLower:
       if token.text == genre['Name']:
@@ -183,7 +188,7 @@ def extract_film(UserID, message):
       if len(film_in_db) > 3:
         film_in_db = film_in_db[:3]
       for film in film_in_db:
-        db.insert_query_information(UserID, film[0], 1)
+        db.insertQueryInformation(UserID, film[0], 1)
       return [film[1] for film in film_in_db]
   return []
 
@@ -199,7 +204,7 @@ def extract_genres(UserID, message):
       genres = genres[:2]
     
     for genre in genres:
-      db.insert_query_information(UserID, genre, 2)
+      db.insertQueryInformation(UserID, genre, 2)
     
     return genres
   return []
@@ -229,7 +234,7 @@ def extract_crew(UserID, message):
 
     if crew_in_db:
       for crew in crew_in_db:
-        db.insert_query_information(UserID, crew, 3)
+        db.insertQueryInformation(UserID, crew, 3)
       return [crew['Name'] for crew in crew_in_db]
   return []
   
@@ -272,9 +277,9 @@ def confirm_film_response(bot, message, User):
   # USE LEMMAS TO REPLACE YES/NO
   if yes.similarity(doc) > 0.8 or skip:
     #TODO CHECK FOR ADDING OF FILMS/REMOVING OF FILMS
-    genres_query_info = db.get_query_info(User.id, 2)
+    genres_query_info = db.getQueryInfo(User.id, 2)
     if genres_query_info:
-      genres = format_query_info(genres_query_info)
+      genres = format_query_info([genre['Information'] for genre in genres_query_info])
       if skip:
         next_question_message = "ite skipping this section. I will suggest a film with the following genres {}".format(genres)
       else:
@@ -289,7 +294,7 @@ def confirm_film_response(bot, message, User):
   elif no.similarity(doc) > 0.8:
     next_stage = 'AskFilm'
     next_question_message = "Ok, so do you want the film I suggest to be similar to another film?"
-    db.remove_query_info(User.id, 1)
+    db.removeQueryInfo(User.id, 1)
 
   bot.send_message(User.id, next_question_message)
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
@@ -303,9 +308,9 @@ def ask_film_response(bot, message, User):
     if token.lower_ == "skip":
       skip = True
   if skip or message.lower() == "no": #TODO CHECK HOW TO SEE YES/NO
-    genres_query_info = db.get_query_info(User.id, 2)
+    genres_query_info = db.getQueryInfo(User.id, 2)
     if genres_query_info:
-      genres = format_query_info(genres_query_info)
+      genres = format_query_info([genre['Information'] for genre in genres_query_info])
       next_question_message = "Ok. So you want a film that is a {} too".format(genres)
       next_stage = 'ConfirmGenre'
     else:
@@ -322,7 +327,7 @@ def ask_film_response(bot, message, User):
       film = (db_query['FilmID'], db_query['Title'])
       if film not in films:
         films.append(film)
-        db.insert_query_information(User.id, film[0], 1)
+        db.insertQueryInformation(User.id, film[0], 1)
     if films:
       filmTitles = format_query_info([film[1] for film in films])
       next_question_message = "So you want a film similar to {}?".format(filmTitles)
@@ -342,9 +347,13 @@ def confirm_genre_response(bot, message, User):
     if token.lower_ == "skip":
       skip = True
   if skip or yes.similarity(doc) > 0.8:
-    crew_query_info = db.get_query_info(User.id, 3)
+    crew_query_info = db.getQueryInfo(User.id, 3)
     if crew_query_info:
-      crew = format_query_info(crew_query_info)
+      crewIDs = [crew['Information'] for crew in crew_query_info]
+      crew_names = []
+      for crewID in crewIDs:
+        crew_names.append(db.getCrewByID(crewID)['Name'])
+      crew = format_query_info(crew_names)
       if skip:
         next_question_message = "skipping, but you want these actors {}?".format(crew)
       else:
@@ -359,7 +368,7 @@ def confirm_genre_response(bot, message, User):
   elif no.similarity(doc) > 0.8:
     next_stage = 'AskGenre'
     next_question_message = "Ok so do you want the film to be of a certain genre, or genres?"
-    db.remove_query_info(User.id, 2)
+    db.removeQueryInfo(User.id, 2)
 
   bot.send_message(User.id, next_question_message)
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
@@ -373,9 +382,13 @@ def ask_genre_response(bot, message, User):
     if token.lower_ == "skip":
       skip = True
   if skip or message.lower() == "no":
-    crew_query_info = db.get_query_info(User.id, 3)
+    crew_query_info = db.getQueryInfo(User.id, 3)
     if crew_query_info:
-      crew = format_query_info(crew_query_info)
+      crewIDs = [crew['Information'] for crew in crew_query_info]
+      crew_names = []
+      for crewID in crewIDs:
+        crew_names.append(db.getCrewByID(crewID)['Name'])
+      crew = format_query_info(crew_names)
       next_question_message = "ok so you want a film where {} was involved?".format(crew)
       next_stage = 'ConfirmCrew'
     else:
@@ -402,13 +415,21 @@ def confirm_crew_response(bot, message, User):
     if token.lower_ == "skip":
       skip = True
   if skip or yes.similarity(doc) > 0.8:
-    
+    suggested_films = hybrid_recommender(User)
+    suggested_film = hybrid_recommender[0]
+    suggested_film_poster_url = get_imdb_film_poster(suggested_film[0]['FilmID'])
+    db.updateSuggestedFilm(User.id, suggested_film['FilmID'])
+    next_question_message = "I have found this film, which I think you will like: {}".format(suggested_film['Title'])
+    bot.send_message(User.id, next_question_message)
+    if suggested_film_poster_url:
+      bot.send_photo(User.id, photo=suggested_film_poster_url)
+    # Generate Poster of Film
     print("Get all details, generate film.")
   elif no.similarity(doc) > 0.8:
     next_question_message = "Ok so do you want the film to have any specific actors, directors or writers?"
     bot.send_message(User.id, next_question_message)
     setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['FilmSuggestion']['AskCrew'])
-    db.remove_query_info(User.id, 3)
+    db.removeQueryInfo(User.id, 3)
   else:
     next_question_message = "Sorry I don't understand, you was these genres or nah?"
     bot.send_message(User.id, next_question_message)
@@ -433,7 +454,7 @@ def ask_crew_response(bot, message, User):
       crewInfo = (db_query['CrewID'], db_query['Name'])
       if crewInfo not in crew:
         crew.append(crewInfo)
-        db.insert_query_information(User.id, crew[0], 1)
+        db.insertQueryInformation(User.id, crew[0], 1)
     if crew:
       crew_names = format_query_info([crew_member[1] for crew_member in crew])
       next_question_message = "So you want the film to have {}?".format(crew_names)
@@ -442,20 +463,25 @@ def ask_crew_response(bot, message, User):
   bot.send_message(User.id, next_question_message)
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
+def confirm_suggested_film_response(bot, message, User):
+  print(True)
+
 def FilmSuggestionHandler(bot, update, User):
   message = update.message.text
   if User.stage == 1:
     extract_data(bot, message, User)
-  if User.stage == 2:
+  elif User.stage == 2:
     confirm_film_response(bot, message, User)
-  if User.stage == 3:
+  elif User.stage == 3:
     ask_film_response(bot, message, User)
-  if User.stage == 4:
+  elif User.stage == 4:
     confirm_genre_response(bot, message, User)
-  if User.stage == 5:
+  elif User.stage == 5:
     ask_genre_response(bot, message, User)
-  if User.stage == 6:
+  elif User.stage == 6:
     confirm_crew_response(bot, message, User)
-  if User.stage == 7:
+  elif User.stage == 7:
     ask_crew_response(bot, message, User)
+  elif User.stage == 8:
+    confirm_suggested_film_response(bot, message, User)
   print("Film Suggestion Handler")

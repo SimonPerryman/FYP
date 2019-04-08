@@ -51,7 +51,6 @@ def updateUserAge(UserID, Age):
         connection.close()
 
 def setUserContextAndStage(UserID, Context, Stage):
-    # if Stage in stages:
     try:
         connection = connect()
         with connection.cursor() as cursor:
@@ -63,9 +62,6 @@ def setUserContextAndStage(UserID, Context, Stage):
         print("Error updating user contextual stage:", str(e))
     finally:
         connection.close()
-    # else:
-    #     #TODO Handle this better
-    #     return False
 
 def setLastMessage(UserID, LastMessage):
     try:
@@ -76,5 +72,17 @@ def setLastMessage(UserID, LastMessage):
         connection.commit()
     except Exception as e:
         print("Error updating user last message time: ", str(e))
+    finally:
+        connection.close()
+
+def updateSuggestedFilm(UserID, SuggestedFilm):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE `users` SET SuggestedFilm = %s WHERE UserID = %s""", (SuggestedFilm, UserID))
+
+        connection.commit()
+    except Exception as e:
+        print("Error updating user suggested film: ", str(e))
     finally:
         connection.close()

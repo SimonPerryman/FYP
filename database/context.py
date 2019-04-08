@@ -24,7 +24,7 @@ stages = {
         "AskGenre": 5,
         "ConfirmCrew": 6,
         "AskCrew": 7,
-        "GeneratedFilm": 8 #TODO change this 
+        "SuggestedFilm": 8 #TODO change this 
     },
     "ChitChat": 1,
     "Error": 0

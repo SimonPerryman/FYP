@@ -28,7 +28,7 @@ def start(bot, update):
     })
     genres_keyboard = botAssets.genresKeyboard()
     reply_markup = telegram.ReplyKeyboardMarkup(genres_keyboard)
-    bot.send_message(chat_id=update.message.chat_id, 
+    bot.send_message(chat_id=update.message.chat_id,
                     text="""Hey {}! Thanks for talking to me, I haven't spoken to anyone in a while! I'm really interested in films.
                     My favourite genre is comedy, what's yours?""".format(update.message.chat.first_name), 
                     reply_markup=reply_markup)

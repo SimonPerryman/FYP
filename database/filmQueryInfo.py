@@ -1,6 +1,6 @@
 from db_connection import connect
 
-def insert_query_information(UserID, Information, Type):
+def insertQueryInformation(UserID, Information, Type):
     try:
         connection = connect()
         with connection.cursor() as cursor:
@@ -13,23 +13,23 @@ def insert_query_information(UserID, Information, Type):
     finally:
         connection.close()
 
-def get_query_info(UserID, Type=None):
+def getQueryInfo(UserID, Type=None):
     try:
         connection = connect()
         with connection.cursor() as cursor:
             if Type:
-                cursor.execute("""SELECT Information from `filmSuggestionQueryInfo`
+                cursor.execute("""SELECT Information, Type from `filmSuggestionQueryInfo`
                                     WHERE UserID = %s AND Type = %s""", (UserID, Type))
             else:
-                cursor.execute("""SELECT Information from `filmSuggestionQueryInfo`
+                cursor.execute("""SELECT Information, Type from `filmSuggestionQueryInfo`
                                     WHERE UserID = %s""", (UserID))
-        return [result['information'] for result in cursor.fetchall()]
+        return cursor.fetchall()
     except Exception as e:
         print("Error getting film query info", str(e))
     finally:
         connection.close()
 
-def remove_query_info(UserID, Type=None):
+def removeQueryInfo(UserID, Type=None):
     try:
         connection = connect()
         with connection.cursor as cursor:
@@ -47,8 +47,4 @@ def remove_query_info(UserID, Type=None):
         
 
 if __name__ == "__main__":
-    print(get_query_info(123))
-    print(get_query_info(123, 1))
-    print(get_query_info(123, 3))
-    print(get_query_info(123, 5))
-    
+    print(getQueryInfo(629604219))

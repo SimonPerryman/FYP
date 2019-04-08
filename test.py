@@ -3,7 +3,7 @@ nlp = spacy.load('en_core_web_lg')
 # from database import getCrewBySimilarName, getAllFilms
 # from nltk.corpus import wordnet
 # import sys
-# sys.path.insert(0, 'C:/dev/projects/University/FYP/recommendation-system/')
+# sys.path.insert(0, 'C:/dev/projects/University/FYP/recommendationSystem/')
 # import pandas as pd
 # import numpy as np
 from spacy import displacy

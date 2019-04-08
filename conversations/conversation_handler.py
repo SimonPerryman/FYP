@@ -31,13 +31,14 @@ def conversation_handler(bot, update):
             self.last_message = userDetails.get('LastMessage', 0)
 
             favouriteGenres =  getFavouriteGenres(userDetails['UserID'])
-            if len(favouriteGenres) > 0:
-                self.favouriteGenre = favouriteGenres[0]
-                if len(favouriteGenres) > 1:
-                    self.secondFavouriteGenre = favouriteGenres[1]
-                    if len(favouriteGenres) > 2:
-                        self.thirdFavouriteGenre = favouriteGenres[2]
-
+            for genre in favouriteGenres:
+                if genre.get('Order', 0) == 1:
+                    self.favouriteGenre = genre.get('Name', 0)
+                elif genre.get('Order', 0) == 2:
+                    self.secondFavouriteGenre = genre.get('Name', 0)
+                elif genre.get('Order', 0) == 3:
+                    self.thirdFavouriteGenre = genre.get('Name', 0)
+                    
     User = Person()
     if User.context == contexts['InitialUserRegistration']:
         registrationHandler(bot, update, User)
