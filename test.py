@@ -46,15 +46,52 @@ import re
 #       return doc
 #     print("Test")
 
+def lemmatize_sentence(sentence):
+  doc = nlp(u"{}".format(sentence))
+  return ' '.join([token.lemma_ for token in doc])
+
+def understand_message(message, l1):
+  lemmatized_message = lemmatize_sentence(message)
+  doc = nlp(u"{}".format(lemmatized_message))
+  for check in l1:
+    check = nlp(u"{}".format(check))
+    check_length = len(check)
+    doc_length = len(doc)
+    if doc_length == check_length:
+      if lemmatized_message == check.text:
+        return True
+    elif doc_length > check_length: 
+      i = 0
+      j = check_length
+      while j <= doc_length:
+        a = doc[i:j]
+        if doc[i:j].text == check.text:
+          return True
+        i += 1
+        j += 1
+    else:
+      i = 0
+      j = doc_length
+      while j <= check_length:
+        if check[i:j].text == doc.text:
+          return True
+        i += 1
+        j += 1
+  return False
+
 def test():
-  simple_responses = ["no", "yes", "maybe", "not sure"]
-  for s in simple_responses:
-    doc = nlp(u"{}".format(s))
-    for token in doc:
-      if token.is_stop:
-        print(token, "is stop")
-      else:
-        print(token, "isn't stop")
+  message = nlp(u"that is correct thanks")
+  positives = [
+    "ok",
+    "that be correct",
+    "correct",
+    "sure",
+    "great",
+    "yes",
+    "sound good",
+    "perfect"
+  ]
+  understand_message(message, positives)
   # doc = nlp(u"yes but also add superman. yes but remove superman. yes but add superman and remove spiderman. yes but replace spiderman with superman")
   # displacy.serve(doc, style="dep")
   # print("Done")

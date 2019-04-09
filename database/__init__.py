@@ -1,4 +1,5 @@
-from .users import (insertUser, getUser, setUserContextAndStage, setLastMessage, updateUserAge, updateSuggestedFilm)
+from .users import (insertUser, getUser, setUserContextAndStage, setLastMessage, updateUserAge, updateSuggestedFilm,
+                    updateSuggestedFilmStatus, updateSuggestedFilmIndex)
 from .conversations import (addToConversation, newConversation, getUserConversations,
                             getSpecificUserConversation)
 from .genres import (getGenre, getAllAlternativeGenreNames, getAllAlternativeGenreNamesForGenre, getGenreByAlternativeGenreName,

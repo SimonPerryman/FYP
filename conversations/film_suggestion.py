@@ -4,10 +4,69 @@ import database as db
 import pandas as pd
 from database import setUserContextAndStage, contexts, stages
 from recommendation_system import hybrid_recommender
-import sys
-sys.path.insert(0, 'C:/dev/projects/University/FYP/')
+from nlp_techniques import lemmatize_sentence
+# import sys
+# sys.path.insert(0, 'C:/dev/projects/University/FYP/')
 from misc import get_imdb_film_details
+from botAssets import positives, negatives, negative_film_responses
 nlp = spacy.load('en_core_web_lg')
+
+def generate_film(bot, User, index):
+  """Generates a suggested film for the user using the query information
+  and the hybrid recommender. If errors, send an error message and resets
+  user stage/context to chitchat.
+  @param {Bot} bot
+  @param {Person} User
+  @param {Int} index"""
+  suggested_films = hybrid_recommender(User)
+  try:
+    suggested_film = suggested_films.iloc[index]
+    suggested_film_poster_url, suggested_film_plot = get_imdb_film_details(suggested_film['FilmID'])
+    db.updateSuggestedFilm(User.id, suggested_film['FilmID'])
+    next_question_message = "I have found this film, which I think you will like: {}".format(suggested_film['Title'])
+    bot.send_message(User.id, next_question_message)
+    if suggested_film_poster_url:
+      bot.send_photo(User.id, photo=suggested_film_poster_url)
+    if suggested_film_plot:
+      bot.send_message(User.id, "Here is the plot of the film:\n{}".format(suggested_film_plot))
+    setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['FilmSuggestion']['SuggestedFilm'])
+  except:
+    bot.send_message(User.id, "I am currently struggling to suggest a similar film for you, please ask me again later.")
+    setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])
+
+def check_for_expected_input(message, expected_inputs):
+  """Checks whether a message an the expected input by checking ngrams
+  of both the message and the expected inputs
+  @param {String} message
+  @param {List} expected_inputs
+  @returns True if message is of expected inputs, else False."""
+  lemmatized_message = lemmatize_sentence(message)
+  doc = nlp(u"{}".format(lemmatized_message))
+  for expected_input in expected_inputs:
+    expected_input = nlp(u"{}".format(expected_input))
+    input_length = len(expected_input)
+    doc_length = len(doc)
+    if doc_length == input_length:
+      if lemmatized_message == expected_input.text:
+        return True
+    elif doc_length > input_length: 
+      i = 0
+      j = input_length
+      while j <= doc_length:
+        a = doc[i:j]
+        if doc[i:j].text == expected_input.text:
+          return True
+        i += 1
+        j += 1
+    else:
+      i = 0
+      j = doc_length
+      while j <= input_length:
+        if expected_input[i:j].text == doc.text:
+          return True
+        i += 1
+        j += 1
+  return False
 
 def preprocess_text(film_name):
   """Preprocess the film name and returns it
@@ -128,9 +187,7 @@ def check_for_crew(message):
   for ent in doc.ents:
     if ent.label_ == "PERSON":
       crew.add(ent.text)
-  
-  # Using Preprocessing and Dependency #TODO proper name
-  
+    
   for token in docLower:
     if token.text == "with" or token.text == "starring":
       message = message[token.idx:].title()
@@ -246,6 +303,7 @@ def extract_data(bot, message, User):
   @param {String} message
   @param {Obj} User"""
   # Noun chunks for <bad>/<funny> etc
+  db.removeQueryInfo(User.id)
   next_stage = 'AskFilm'
   extract_genres(User.id, message)
   extract_crew(User.id, message)
@@ -265,8 +323,8 @@ def confirm_film_response(bot, message, User):
   @param {Obj} bot
   @param {String} message
   @param {Obj} User"""
-  yes = nlp(u"yes")
-  no = nlp(u"no")
+  # yes = nlp(u"yes")
+  # no = nlp(u"no")
   skip = False
   next_question_message = "Error lol, you wanna confirm that film from before or nah"
   next_stage = 'ConfirmFilm'
@@ -275,7 +333,7 @@ def confirm_film_response(bot, message, User):
     if token.lower_ == "skip":
       skip = True
   # USE LEMMAS TO REPLACE YES/NO
-  if yes.similarity(doc) > 0.8 or skip:
+  if check_for_expected_input(message, positives) or skip:
     #TODO CHECK FOR ADDING OF FILMS/REMOVING OF FILMS
     genres_query_info = db.getQueryInfo(User.id, 2)
     if genres_query_info:
@@ -291,7 +349,7 @@ def confirm_film_response(bot, message, User):
       else:
         next_question_message = "You said yes so we are moving on... You want any genres?"
       next_stage = 'AskGenre'
-  elif no.similarity(doc) > 0.8:
+  elif check_for_expected_input(message, negatives):
     next_stage = 'AskFilm'
     next_question_message = "Ok, so do you want the film I suggest to be similar to another film?"
     db.removeQueryInfo(User.id, 1)
@@ -307,7 +365,7 @@ def ask_film_response(bot, message, User):
   for token in doc:
     if token.lower_ == "skip":
       skip = True
-  if skip or message.lower() == "no": #TODO CHECK HOW TO SEE YES/NO
+  if skip or check_for_expected_input(message, negatives): #TODO CHECK HOW TO SEE YES/NO
     genres_query_info = db.getQueryInfo(User.id, 2)
     if genres_query_info:
       genres = format_query_info([genre['Information'] for genre in genres_query_info])
@@ -316,7 +374,7 @@ def ask_film_response(bot, message, User):
     else:
       next_question_message = "Ok, do you want the film to be for any specific genre?"
       next_stage = 'AskGenre'
-  elif message.lower() == "yes":
+  elif check_for_expected_input(message, positives):
     next_question_message = "Ok, what film do you want it to be based on?"
   else:
     films = extract_film(User.id, message)
@@ -337,8 +395,6 @@ def ask_film_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_genre_response(bot, message, User):
-  yes = nlp(u"yes")
-  no = nlp(u"no")
   next_question_message = "Didn't catch that, you want this genre(s) or nah?"
   next_stage = 'ConfirmGenre'
   skip = False
@@ -346,7 +402,7 @@ def confirm_genre_response(bot, message, User):
   for token in doc:
     if token.lower_ == "skip":
       skip = True
-  if skip or yes.similarity(doc) > 0.8:
+  if skip or check_for_expected_input(message, positives):
     crew_query_info = db.getQueryInfo(User.id, 3)
     if crew_query_info:
       crewIDs = [crew['Information'] for crew in crew_query_info]
@@ -365,7 +421,7 @@ def confirm_genre_response(bot, message, User):
       else:
         next_question_message = "you want it to star, be directed, or be written by anyone?"
       next_stage = "AskCrew"
-  elif no.similarity(doc) > 0.8:
+  elif check_for_expected_input(message, negatives):
     next_stage = 'AskGenre'
     next_question_message = "Ok so do you want the film to be of a certain genre, or genres?"
     db.removeQueryInfo(User.id, 2)
@@ -381,7 +437,7 @@ def ask_genre_response(bot, message, User):
   for token in doc:
     if token.lower_ == "skip":
       skip = True
-  if skip or message.lower() == "no":
+  if skip or check_for_expected_input(message, negatives):
     crew_query_info = db.getQueryInfo(User.id, 3)
     if crew_query_info:
       crewIDs = [crew['Information'] for crew in crew_query_info]
@@ -394,7 +450,7 @@ def ask_genre_response(bot, message, User):
     else:
       next_question_message = "Ok so do you want a film with specific actors, directors or writers?"
       next_stage = 'AskCrew'
-  elif message.lower() == "yes":
+  elif check_for_expected_input(message, positives):
     next_question_message = "Ok, what actors, directors or writers did you have in mind?"
   else:
     genres = extract_genres(User.id, message)
@@ -407,27 +463,14 @@ def ask_genre_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_crew_response(bot, message, User):
-  yes = nlp(u"yes")
-  no = nlp(u"no")
   skip = False
   doc = nlp(u"{}".format(message))
   for token in doc:
     if token.lower_ == "skip":
       skip = True
-  if skip or yes.similarity(doc) > 0.8:
-    suggested_films = hybrid_recommender(User)
-    suggested_film = suggested_films.iloc[0]
-    suggested_film_poster_url, suggested_film_plot = get_imdb_film_details(suggested_film['FilmID'])
-    db.updateSuggestedFilm(User.id, suggested_film['FilmID'])
-    next_question_message = "I have found this film, which I think you will like: {}".format(suggested_film['Title'])
-    bot.send_message(User.id, next_question_message)
-    if suggested_film_poster_url:
-      bot.send_photo(User.id, photo=suggested_film_poster_url)
-    if suggested_film_plot:
-      bot.send_message(User.id, "Here is the plot of the film:\n{}".format(suggested_film_plot))
-    # Generate Poster of Film
-    print("Get all details, generate film.")
-  elif no.similarity(doc) > 0.8:
+  if skip or check_for_expected_input(message, positives):
+    generate_film(bot, User, 0)
+  elif check_for_expected_input(message, negatives):
     next_question_message = "Ok so do you want the film to have any specific actors, directors or writers?"
     bot.send_message(User.id, next_question_message)
     setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['FilmSuggestion']['AskCrew'])
@@ -444,9 +487,9 @@ def ask_crew_response(bot, message, User):
   for token in doc:
     if token.lower_ == "skip":
       skip = True
-  if skip or message.lower() == "no":
+  if skip or check_for_expected_input(message, negatives):
     print("Do something like recommend")
-  elif message.lower() == "yes":
+  elif check_for_expected_input(message, positives):
     next_question_message = "ok, what crew members do you want?"
   else:
     crew = extract_crew(User.id, message)
@@ -466,7 +509,16 @@ def ask_crew_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_suggested_film_response(bot, message, User):
-  print(True)
+  if check_for_expected_input(message, positives):
+    db.updateSuggestedFilmStatus(User.id, 1)
+    db.removeQueryInfo(User.id)
+    bot.send_message(User.id, "Ok, have fun watching the film! Let me know what you thought of it!")
+  elif check_for_expected_input(message, negatives.extend(negative_film_responses)):
+      new_index = User.suggested_film_index + 1
+      generate_film(bot, User, new_index)
+      db.updateSuggestedFilmIndex(User.id, new_index)
+  else:
+    bot.send_message(User.id, "Sorry I don't understand, is this film fine?")
 
 def FilmSuggestionHandler(bot, update, User):
   message = update.message.text

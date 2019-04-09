@@ -31,7 +31,7 @@ def getUser(UserID):
         connection = connect()
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM `users` WHERE UserID = %s""", UserID)
-        #TODO insert logic to set this to be a class
+
         return cursor.fetchone()
     except Exception as e:
         print("Error getting user info: ", str(e))
@@ -79,7 +79,31 @@ def updateSuggestedFilm(UserID, SuggestedFilm):
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.execute("""UPDATE `users` SET SuggestedFilm = %s WHERE UserID = %s""", (SuggestedFilm, UserID))
+            cursor.execute("""UPDATE `users` SET SuggestedFilm = %s, SuggestedFilmStatus = 0 WHERE UserID = %s""", (SuggestedFilm, UserID))
+
+        connection.commit()
+    except Exception as e:
+        print("Error updating user suggested film: ", str(e))
+    finally:
+        connection.close()
+
+def updateSuggestedFilmStatus(UserID, Status):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE `users` SET SuggestedFilmStatus = %s WHERE UserID = %s""", (Status, UserID))
+
+        connection.commit()
+    except Exception as e:
+        print("Error updating user suggested film: ", str(e))
+    finally:
+        connection.close()
+
+def updateSuggestedFilmIndex(UserID, Index):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE `users` SET SuggestedFilmIndex = %s WHERE UserID = %s""", (Index, UserID))
 
         connection.commit()
     except Exception as e:

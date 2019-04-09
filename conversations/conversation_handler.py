@@ -29,7 +29,7 @@ def conversation_handler(bot, update):
             self.context = userDetails.get('Context', 0)
             self.stage = userDetails.get('Stage', 0)
             self.last_message = userDetails.get('LastMessage', 0)
-
+            self.suggested_film_index = userDetails.get('SuggestedFilmIndex', 0)
             favouriteGenres =  getFavouriteGenres(userDetails['UserID'])
             for genre in favouriteGenres:
                 if genre.get('Order', 0) == 1:
