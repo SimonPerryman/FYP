@@ -131,9 +131,13 @@ def build_tailored_films_table(User):
             (filmsTable['FilmID'] == requested_filmID)
             )]
     
-    
+    requested_film = filmsTable[(filmsTable['FilmID'] == requested_filmID)]
     if filmsTable.shape[0] > 2000:
         filmsTable = sort_by_highest_imdb_score(filmsTable)[:2000]
+        # Check whether we removed the requested film from the table when reducing the size
+        if filmsTable[(filmsTable['FilmID'] == requested_filmID)].empty:
+            filmsTable = pd.concat([filmsTable, requested_film])
+    
     filmsTable = filmsTable.reset_index(drop=True)
     return filmsTable, requested_filmID
 

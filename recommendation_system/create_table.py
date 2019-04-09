@@ -102,5 +102,4 @@ def getFilmTable():
     return create_film_table()
 
 if __name__ == "__main__":
-    print(getFilmTable().head())
-    # create_film_table()
+    create_film_table()

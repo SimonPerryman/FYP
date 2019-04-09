@@ -47,7 +47,7 @@ def search_for_film_start(message):
   returned if the film title is not found."""
   accepted_film_synonyms = ["movie", "film", "something"]
   doc = nlp(message)
-  genres = [genre['Name'] for genre in getAllGenres()]
+  genres = [genre['Name'] for genre in db.getAllGenres()]
   index = 0
   for token in doc:
     if token.text == "to":
@@ -416,8 +416,8 @@ def confirm_crew_response(bot, message, User):
       skip = True
   if skip or yes.similarity(doc) > 0.8:
     suggested_films = hybrid_recommender(User)
-    suggested_film = hybrid_recommender[0]
-    suggested_film_poster_url, suggested_film_plot = get_imdb_film_details(suggested_film[0]['FilmID'])
+    suggested_film = suggested_films.iloc[0]
+    suggested_film_poster_url, suggested_film_plot = get_imdb_film_details(suggested_film['FilmID'])
     db.updateSuggestedFilm(User.id, suggested_film['FilmID'])
     next_question_message = "I have found this film, which I think you will like: {}".format(suggested_film['Title'])
     bot.send_message(User.id, next_question_message)

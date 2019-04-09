@@ -5,7 +5,7 @@ def insertFilmDB(Films):
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.executemany("""INSERT INTO `films2` (FilmID, Title, TitlePP, isAdult,
+            cursor.executemany("""INSERT INTO `films` (FilmID, Title, TitlePP, isAdult,
             Year, RunTime) VALUES (%s, %s, %s, %s, %s, %s)""", Films)
 
         connection.commit()
