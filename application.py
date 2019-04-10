@@ -1,7 +1,7 @@
 # Default Python Packages
 import logging
 import random
-import time
+from time import time
 from configparser import ConfigParser
 
 # Third Party Libraries
@@ -24,7 +24,7 @@ def start(bot, update):
     newConversation(update.message.chat.id, {
         "MessageID": random.randint(0, 99999999),
         "Message": update.message.text,
-        "Timestamp": int(time.time())
+        "Timestamp": int(time())
     })
     genres_keyboard = botAssets.genresKeyboard()
     reply_markup = telegram.ReplyKeyboardMarkup(genres_keyboard)

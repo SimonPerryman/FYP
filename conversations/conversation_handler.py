@@ -1,7 +1,9 @@
+from time import time
 from .chitchat import *
 from .registration import registrationHandler
 from .film_suggestion import FilmSuggestionHandler
 from context import contexts
+import database as db
 import spacy
 nlp = spacy.load('en_core_web_lg')
 
@@ -40,6 +42,7 @@ def conversation_handler(bot, update):
                     self.thirdFavouriteGenre = genre.get('Name', 0)
                     
     User = Person()
+    db.setLastMessage(User.id, int(time()))
     if User.context == contexts['InitialUserRegistration']:
         registrationHandler(bot, update, User)
     elif User.context == contexts['FilmSuggestion'] or intent == 1:

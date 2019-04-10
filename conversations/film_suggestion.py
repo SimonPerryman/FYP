@@ -544,6 +544,7 @@ def confirm_suggested_film_response(bot, message, User):
   negative_film_responses.extend(negatives)
   if check_for_expected_input(message, positives):
     db.updateSuggestedFilmStatus(User.id, 1)
+    db.updateSuggestedFilmIndex(User.id, 0)
     db.removeQueryInfo(User.id)
     bot.send_message(User.id, "Ok, have fun watching the film! Let me know what you thought of it!")
     setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])
