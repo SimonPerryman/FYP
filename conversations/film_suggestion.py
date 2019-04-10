@@ -183,7 +183,6 @@ def check_for_crew(message):
   crew_present = False
   doc = nlp(u'{}'.format(message))
   docLower = nlp(u'{}'.format(message.lower()))
-  # Use in built entity #TODO proper name
   for ent in doc.ents:
     if ent.label_ == "PERSON":
       crew.add(ent.text)
@@ -279,12 +278,6 @@ def extract_crew(UserID, message):
   @param {String} message
   @returns {List} Crew Member Names, Empty if none found"""
   crew = check_for_crew(message)
-  # preprocessed_message = preprocess_text(message)
-  # db_query = db.getCrewByProcessedName(preprocessed_message)
-  # if db_query:
-  #   crewInfo = (db_query['CrewID'], db_query['Name'])
-  #   if crewInfo not in crew:
-  #     crew.append(crewInfo)
   if crew:
     crew_in_db = set()
     for crew_member in crew:
@@ -305,10 +298,10 @@ def extract_crew(UserID, message):
 def extract_data(bot, message, User):
   """Calls the functions to search for the genre, film and crew information
   and inserts the relevant information into the database.
-  @param {Obj} bot
+  @param {Bot} bot
   @param {String} message
-  @param {Obj} User"""
-  # Noun chunks for <bad>/<funny> etc
+  @param {Person} User"""
+  #TODO Noun chunks for <bad>/<funny> etc
   db.removeQueryInfo(User.id)
   next_stage = 'AskFilm'
   extract_genres(User.id, message)
@@ -326,13 +319,17 @@ def extract_data(bot, message, User):
 
 def confirm_film_response(bot, message, User):
   """Stage 2 Response. Confirming the extracted film information was correct.
-  @param {Obj} bot
+  @param {Bot} bot
   @param {String} message
-  @param {Obj} User"""
-  # yes = nlp(u"yes")
-  # no = nlp(u"no")
+  @param {Person} User"""
   skipFlag = False
-  next_question_message = "Error lol, you wanna confirm that film from before or nah"
+  db_query = db.getQueryInfo(User.id, 1)
+  film_name = ''
+  if db_query:
+    film_name = db.getFilmByID(db_query['Information'])['Title']
+  next_question_message = "Sorry I'm not sure I understand."
+  if film_name:
+    next_question_message = next_question_message + " Did you want a film similar to {}".format(film_name)
   next_stage = 'ConfirmFilm'
   if check_for_expected_input(message, skip):
     skipFlag = True
@@ -342,15 +339,15 @@ def confirm_film_response(bot, message, User):
     if genres_query_info:
       genres = format_query_info([genre['Information'] for genre in genres_query_info])
       if skipFlag:
-        next_question_message = "ite skipping this section. I will suggest a film with the following genres {}".format(genres)
+        next_question_message = "Ok let's skip choosing a similar film. I just want to confirm that you did want a film that was a {}".format(genres)
       else:
-        next_question_message = "You said yes so we are moving on... I will suggest the following genres {}".format(genres)
+        next_question_message = "Alright that sounds good! I just want to confirm that you did want a film that was a {}".format(genres)
       next_stage = 'ConfirmGenre'
     else:
       if skipFlag:
-        next_question_message = "ite skipping this section. You want any genres"
+        next_question_message = "Ok let's skip choosing a similar film. Did you want the film to have any specific genres?"
       else:
-        next_question_message = "You said yes so we are moving on... You want any genres?"
+        next_question_message = "Alright that sounds good! Did you want the film to have any specific genres?"
       next_stage = 'AskGenre'
   elif check_for_expected_input(message, negatives):
     next_stage = 'AskFilm'
@@ -361,22 +358,27 @@ def confirm_film_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
     
 def ask_film_response(bot, message, User):
+  """Stage 3 Response. Asking if the user wants the suggested film to be similar to
+  another film.
+  @param {Bot} bot
+  @param {String} message
+  @param {Person} User"""
   skipFlag = False
   next_stage = 'AskFilm'
-  next_question_message = "Sorry didn't quite catch that - did you want a film to be like another"
+  next_question_message = "Sorry I don't understand. Do you want the film to be similar to another film you've seen?"
   if check_for_expected_input(message, skip):
       skipFlag = True
   if skipFlag or check_for_expected_input(message, negatives):
     genres_query_info = db.getQueryInfo(User.id, 2)
     if genres_query_info:
       genres = format_query_info([genre['Information'] for genre in genres_query_info])
-      next_question_message = "Ok. So you want a film that is a {} too".format(genres)
+      next_question_message = "Ok. So you want a film that is a {}?".format(genres)
       next_stage = 'ConfirmGenre'
     else:
-      next_question_message = "Ok, do you want the film to be for any specific genre?"
+      next_question_message = "Ok, Did you want the film to have any specific genres?"
       next_stage = 'AskGenre'
   elif check_for_expected_input(message, positives):
-    next_question_message = "Ok, what film do you want it to be based on?"
+    next_question_message = "Ok, what film do you want it to be similar to?"
   else:
     films = extract_film(User.id, message)
     #In case the user just sends the film title and nothing else
@@ -396,7 +398,17 @@ def ask_film_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_genre_response(bot, message, User):
-  next_question_message = "Didn't catch that, you want this genre(s) or nah?"
+  """Stage 4 Response. Confirming the extracted genre information was correct.
+  @param {Bot} bot
+  @param {String} message
+  @param {Person} User"""
+  db_query = db.getQueryInfo(User.id, 2)
+  genre = ''
+  if db_query:
+    genre = db_query['Information']
+  next_question_message = "Sorry I'm not sure I understand."
+  if genre:
+    next_question_message = next_question_message + " Did you want the film to be a {}".format(genre)
   next_stage = 'ConfirmGenre'
   skipFlag = False
   if check_for_expected_input(message, skip):
@@ -410,28 +422,32 @@ def confirm_genre_response(bot, message, User):
         crew_names.append(db.getCrewByID(crewID)['Name'])
       crew = format_query_info(crew_names)
       if skipFlag:
-        next_question_message = "skipping, but you want these actors {}?".format(crew)
+        next_question_message = "Ok, let's skip choosing a genre. From what you said earlier, you wanted {} to have been involved with the film?".format(crew)
       else:
-        next_question_message = "You said yes so we are moving on... I will suggest a film with these actors: {}".format(crew)
+        next_question_message = "Right, I'll note that down. From what you said earlier, you wanted {} to have been involved with the film?".format(crew)
       next_stage = 'ConfirmCrew'
     else:
       if skipFlag:
-        next_question_message = "ite skipping, you want it to star, be directed, or be written by anyone?"
+        next_question_message = "Ok let's skip choosing a genre. Are there any people you want to have been involved with them film?"
       else:
-        next_question_message = "you want it to star, be directed, or be written by anyone?"
+        next_question_message = "Right, I'll note that down. Are there any people you want to have been involved with them film?"
       next_stage = "AskCrew"
   elif check_for_expected_input(message, negatives):
     next_stage = 'AskGenre'
-    next_question_message = "Ok so do you want the film to be of a certain genre, or genres?"
+    next_question_message = "Ok, so are there any genres that you want the film to be of?"
     db.removeQueryInfo(User.id, 2)
 
   bot.send_message(User.id, next_question_message)
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def ask_genre_response(bot, message, User):
+  """Stage 5 Response. Asking the user if they want the suggested film to be of a certain genre.
+  @param {Bot} bot
+  @param {String} message
+  @param {Person} User"""
   skipFlag = False
   next_stage = 'AskGenre'
-  next_question_message = "Sorry didn't quite catch that - what genre(s) did you want?"
+  next_question_message = "Sorry I'm not sure what you meant, were there any genres you had in mind for the film I will suggest?"
   if check_for_expected_input(message, skip):
       skipFlag = True
   if skipFlag or check_for_expected_input(message, negatives):
@@ -460,6 +476,10 @@ def ask_genre_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_crew_response(bot, message, User):
+  """Stage 6 Response. Confirming the extracted crew information was correct.
+  @param {Bot} bot
+  @param {String} message
+  @param {Person} User"""
   skipFlag = False
   if check_for_expected_input(message, skip):
       skipFlag = True
@@ -467,19 +487,30 @@ def confirm_crew_response(bot, message, User):
     generate_film(bot, User, 0)
     db.updateSuggestedFilmIndex(User.id, 0)
   elif check_for_expected_input(message, negatives):
-    next_question_message = "Ok so do you want the film to have any specific actors, directors or writers?"
+    next_question_message = "Ok so did you want any specific people to have been involved with the film?"
     bot.send_message(User.id, next_question_message)
     setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion']['AskCrew'])
     db.removeQueryInfo(User.id, 3)
   else:
-    next_question_message = "Sorry I don't understand, you want this crew member?"
+    db_query = db.getQueryInfo(User.id, 3)
+    crew_name = ''
+    if db_query:
+      crew_name = db.getCrewByID(db_query['Information'])['Name']
+    next_question_message = "Sorry I don't understand."
+    if crew_name:
+      next_question_message = next_question_message + " Did you want a film similar to {}".format(crew_name)
     bot.send_message(User.id, next_question_message)
 
 def ask_crew_response(bot, message, User):
+  """Stage 7 Response. Asking the user if they want the suggested film to include certain
+  actors, actresses, directors or writers.
+  @param {Bot} bot
+  @param {String} message
+  @param {Person} User"""
   generatedFilm = False
   skipFlag = False
   next_stage = 'AskCrew'
-  next_question_message = 'Sorry, I do not understand, what crew members?'
+  next_question_message = "Sorry I'm not sure I understood correctly. Did you want any specific people to have been involved with the film?"
   if check_for_expected_input(message, skip):
       skipFlag = True
   if skipFlag or check_for_expected_input(message, negatives):
@@ -487,7 +518,7 @@ def ask_crew_response(bot, message, User):
     db.updateSuggestedFilmIndex(User.id, 0)
     generatedFilm = True
   elif check_for_expected_input(message, positives):
-    next_question_message = "ok, what crew members do you want?"
+    next_question_message = "Ok, what are the names of these crew members?"
   else:
     crew = extract_crew(User.id, message)
     preprocessed_message = preprocess_text(message)
@@ -499,13 +530,17 @@ def ask_crew_response(bot, message, User):
         db.insertQueryInformation(User.id, crew[0], 1)
     if crew:
       crew_names = format_query_info([crew_member[1] for crew_member in crew])
-      next_question_message = "So you want the film to have {}?".format(crew_names)
+      next_question_message = "So you want {} to have worked on the film?".format(crew_names)
       next_stage = 'ConfirmCrew'
   if not generatedFilm:
     bot.send_message(User.id, next_question_message)
     setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_suggested_film_response(bot, message, User):
+  """Stage 8 Response. Checking the user's outcome of the suggested film
+  @param {Bot} bot
+  @param {String} message
+  @param {Person} User"""
   negative_film_responses.extend(negatives)
   if check_for_expected_input(message, positives):
     db.updateSuggestedFilmStatus(User.id, 1)
@@ -520,6 +555,11 @@ def confirm_suggested_film_response(bot, message, User):
     bot.send_message(User.id, "Sorry I don't understand, is this film fine?")
 
 def FilmSuggestionHandler(bot, update, User):
+  """Handler function to call the relevant function depending on
+  what stage the user is on in the film suggestion journey.
+  @param {Bot} bot
+  @param {String} message
+  @param {Person} User"""
   message = update.message.text
   if User.stage == 1:
     extract_data(bot, message, User)
@@ -537,4 +577,3 @@ def FilmSuggestionHandler(bot, update, User):
     ask_crew_response(bot, message, User)
   elif User.stage == 8:
     confirm_suggested_film_response(bot, message, User)
-  print("Film Suggestion Handler")
