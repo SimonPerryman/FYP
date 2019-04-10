@@ -17,7 +17,8 @@ positives = [
     "great",
     "yes",
     "sound good",
-    "perfect"
+    "perfect",
+    "yeah"
 ]
 
 negatives = [
@@ -29,5 +30,13 @@ negatives = [
 negative_film_responses = [
     "i do not like this",
     "i want a different",
-    "i be not a fan of this"
+    "i be not a fan of this",
+    "i have see this",
+    "do not want to see this"
+]
+
+skip = [
+    "skip",
+    "i want to skip this",
+    "i do not care"
 ]

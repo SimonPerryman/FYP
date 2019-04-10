@@ -80,18 +80,12 @@ def understand_message(message, l1):
   return False
 
 def test():
-  message = nlp(u"that is correct thanks")
-  positives = [
-    "ok",
-    "that be correct",
-    "correct",
-    "sure",
-    "great",
-    "yes",
-    "sound good",
-    "perfect"
-  ]
-  understand_message(message, positives)
+  # print(lemmatize_sentence("I don't want to see this"))
+  doc = nlp(u"Suggest a film written by Tom Cruise")
+  for token in doc:
+    print(True)
+  print(True)
+  # displacy.serve(doc, style="dep")
   # doc = nlp(u"yes but also add superman. yes but remove superman. yes but add superman and remove spiderman. yes but replace spiderman with superman")
   # displacy.serve(doc, style="dep")
   # print("Done")

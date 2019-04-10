@@ -59,19 +59,23 @@ def find_films_with_all_genres(requested_genres, film_genres):
         return True
     return False
 
-def get_generated_requested_filmID(UserID):
+def get_generated_requested_filmID(UserID, filmsTable):
     """Function to generate a random film ID, either from the user's known liked films,
     or from the IMDB top 250.
     @param {Int} UserID
-    @returns {String} requested_filmID"""
+    @param {DataFrame} filmsTable
+    @returns {String} randomly generated filmID"""
     db_query = getUserRatings(UserID)
+    user_ratings = []
     if db_query:
-        user_ratings = [rating for rating in user_ratings if rating['Liked'] == 1]
-        if not user_ratings:
-            user_ratings = sort_by_highest_imdb_score(filmsTable).reset_index(drop=True)
-        shuffle(user_ratings)
-        index = randint(0, len(user_ratings) - 1)
-        requested_filmID = user_ratings[index]
+        user_ratings = [rating['FilmID'] for rating in db_query if rating['Liked'] == 1]
+    if not user_ratings:
+        user_ratings = sort_by_highest_imdb_score(filmsTable).reset_index(drop=True)[:250]
+        user_ratings = user_ratings['FilmID'].tolist()
+    shuffle(user_ratings)
+    index = randint(0, len(user_ratings) - 1)
+    return user_ratings[index]
+    
 
 def build_tailored_films_table(User):
     """Build a films table tailored to the user's requests
@@ -91,10 +95,13 @@ def build_tailored_films_table(User):
             requested_genres.append(result['Information'])
         elif result['Type'] == 3:
             requested_crew.append(result['Information'])
+
+    if not requested_filmID.startswith("tt"):
+        requested_filmID = None
     
     # No Film Selected
     if not requested_filmID:
-        requested_filmID = get_generated_requested_filmID(User.id)
+        requested_filmID = get_generated_requested_filmID(User.id, filmsTable)
                   
     if not requested_genres:
         if User.favouriteGenre:

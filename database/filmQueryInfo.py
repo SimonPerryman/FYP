@@ -32,14 +32,15 @@ def getQueryInfo(UserID, Type=None):
 def removeQueryInfo(UserID, Type=None):
     try:
         connection = connect()
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             if Type:
                 cursor.execute("""DELETE FROM `filmSuggestionQueryInfo`
-                                WHERE UserID = %s and Type = %s""", (UserID, Type))
+                                WHERE UserID = %s AND Type = %s""", (UserID, Type))
             else:
                 cursor.execute("""DELETE FROM `filmSuggestionQueryInfo`
                                 WHERE UserID = %s""", (UserID))
-        return cursor.fetchall()
+
+        connection.commit()
     except Exception as e:
         print("Error deleting film query info", str(e))
     finally:

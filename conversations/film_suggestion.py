@@ -8,7 +8,7 @@ from nlp_techniques import lemmatize_sentence
 # import sys
 # sys.path.insert(0, 'C:/dev/projects/University/FYP/')
 from misc import get_imdb_film_details
-from botAssets import positives, negatives, negative_film_responses
+from botAssets import positives, negatives, negative_film_responses, skip
 nlp = spacy.load('en_core_web_lg')
 
 def generate_film(bot, User, index):
@@ -29,10 +29,11 @@ def generate_film(bot, User, index):
       bot.send_photo(User.id, photo=suggested_film_poster_url)
     if suggested_film_plot:
       bot.send_message(User.id, "Here is the plot of the film:\n{}".format(suggested_film_plot))
-    setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['FilmSuggestion']['SuggestedFilm'])
-  except:
+    setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion']['SuggestedFilm'])
+  except Exception as e:
     bot.send_message(User.id, "I am currently struggling to suggest a similar film for you, please ask me again later.")
     setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])
+    print("Error suggesting a film", str(e))
 
 def check_for_expected_input(message, expected_inputs):
   """Checks whether a message an the expected input by checking ngrams
@@ -53,7 +54,6 @@ def check_for_expected_input(message, expected_inputs):
       i = 0
       j = input_length
       while j <= doc_length:
-        a = doc[i:j]
         if doc[i:j].text == expected_input.text:
           return True
         i += 1
@@ -72,7 +72,7 @@ def preprocess_text(film_name):
   """Preprocess the film name and returns it
   @param {String} film_name
   @returns Preprocessed film name"""
-  return re.sub(r"[^\s^\d^\w]", "", film_name).replace(" ", "")
+  return re.sub(r"[^\s^\d^\w]", "", film_name.lower()).replace(" ", "")
 
 def format_query_info(message_data):
   """Formats the data passed to the function
@@ -192,6 +192,12 @@ def check_for_crew(message):
     if token.text == "with" or token.text == "starring":
       message = message[token.idx:].title()
       crew_present = True
+    
+    if token.text == "by":
+      for anc in token.anc:
+        if anc.text == "directed" or anc.text == "written":
+          message = message[token.idx:].title()
+          crew_present = True
 
   if crew_present:
     doc = nlp(message)
@@ -220,7 +226,7 @@ def check_for_film(message):
   if film_present != 0:
     db_query = iterate_through_ngrams(message)
     if db_query:
-      film.add(db_query)
+      film.add(db_query[1])
 
   return list(film)
 
@@ -234,7 +240,7 @@ def extract_film(UserID, message):
   film_in_db = set()
   if film:
     for film_info in film:
-      preprocessed_film_name = preprocess_text(film_info[1])
+      preprocessed_film_name = preprocess_text(film_info)
       
       db_query = search_for_film_in_db(preprocessed_film_name)
       if db_query:
@@ -291,8 +297,8 @@ def extract_crew(UserID, message):
 
     if crew_in_db:
       for crew in crew_in_db:
-        db.insertQueryInformation(UserID, crew, 3)
-      return [crew['Name'] for crew in crew_in_db]
+        db.insertQueryInformation(UserID, crew[0], 3)
+      return [crew[1] for crew in crew_in_db]
   return []
   
 
@@ -325,26 +331,23 @@ def confirm_film_response(bot, message, User):
   @param {Obj} User"""
   # yes = nlp(u"yes")
   # no = nlp(u"no")
-  skip = False
+  skipFlag = False
   next_question_message = "Error lol, you wanna confirm that film from before or nah"
   next_stage = 'ConfirmFilm'
-  doc = nlp(u"{}".format(message))
-  for token in doc:
-    if token.lower_ == "skip":
-      skip = True
-  # USE LEMMAS TO REPLACE YES/NO
-  if check_for_expected_input(message, positives) or skip:
+  if check_for_expected_input(message, skip):
+    skipFlag = True
+  if check_for_expected_input(message, positives) or skipFlag:
     #TODO CHECK FOR ADDING OF FILMS/REMOVING OF FILMS
     genres_query_info = db.getQueryInfo(User.id, 2)
     if genres_query_info:
       genres = format_query_info([genre['Information'] for genre in genres_query_info])
-      if skip:
+      if skipFlag:
         next_question_message = "ite skipping this section. I will suggest a film with the following genres {}".format(genres)
       else:
         next_question_message = "You said yes so we are moving on... I will suggest the following genres {}".format(genres)
       next_stage = 'ConfirmGenre'
     else:
-      if skip:
+      if skipFlag:
         next_question_message = "ite skipping this section. You want any genres"
       else:
         next_question_message = "You said yes so we are moving on... You want any genres?"
@@ -358,14 +361,12 @@ def confirm_film_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
     
 def ask_film_response(bot, message, User):
-  skip = False
+  skipFlag = False
   next_stage = 'AskFilm'
   next_question_message = "Sorry didn't quite catch that - did you want a film to be like another"
-  doc = nlp(u'{}'.format(message))
-  for token in doc:
-    if token.lower_ == "skip":
-      skip = True
-  if skip or check_for_expected_input(message, negatives): #TODO CHECK HOW TO SEE YES/NO
+  if check_for_expected_input(message, skip):
+      skipFlag = True
+  if skipFlag or check_for_expected_input(message, negatives):
     genres_query_info = db.getQueryInfo(User.id, 2)
     if genres_query_info:
       genres = format_query_info([genre['Information'] for genre in genres_query_info])
@@ -397,12 +398,10 @@ def ask_film_response(bot, message, User):
 def confirm_genre_response(bot, message, User):
   next_question_message = "Didn't catch that, you want this genre(s) or nah?"
   next_stage = 'ConfirmGenre'
-  skip = False
-  doc = nlp(u"{}".format(message))
-  for token in doc:
-    if token.lower_ == "skip":
-      skip = True
-  if skip or check_for_expected_input(message, positives):
+  skipFlag = False
+  if check_for_expected_input(message, skip):
+      skipFlag = True
+  if skipFlag or check_for_expected_input(message, positives):
     crew_query_info = db.getQueryInfo(User.id, 3)
     if crew_query_info:
       crewIDs = [crew['Information'] for crew in crew_query_info]
@@ -410,13 +409,13 @@ def confirm_genre_response(bot, message, User):
       for crewID in crewIDs:
         crew_names.append(db.getCrewByID(crewID)['Name'])
       crew = format_query_info(crew_names)
-      if skip:
+      if skipFlag:
         next_question_message = "skipping, but you want these actors {}?".format(crew)
       else:
         next_question_message = "You said yes so we are moving on... I will suggest a film with these actors: {}".format(crew)
       next_stage = 'ConfirmCrew'
     else:
-      if skip:
+      if skipFlag:
         next_question_message = "ite skipping, you want it to star, be directed, or be written by anyone?"
       else:
         next_question_message = "you want it to star, be directed, or be written by anyone?"
@@ -430,14 +429,12 @@ def confirm_genre_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def ask_genre_response(bot, message, User):
-  skip = False
+  skipFlag = False
   next_stage = 'AskGenre'
   next_question_message = "Sorry didn't quite catch that - what genre(s) did you want?"
-  doc = nlp(u'{}'.format(message))
-  for token in doc:
-    if token.lower_ == "skip":
-      skip = True
-  if skip or check_for_expected_input(message, negatives):
+  if check_for_expected_input(message, skip):
+      skipFlag = True
+  if skipFlag or check_for_expected_input(message, negatives):
     crew_query_info = db.getQueryInfo(User.id, 3)
     if crew_query_info:
       crewIDs = [crew['Information'] for crew in crew_query_info]
@@ -451,7 +448,7 @@ def ask_genre_response(bot, message, User):
       next_question_message = "Ok so do you want a film with specific actors, directors or writers?"
       next_stage = 'AskCrew'
   elif check_for_expected_input(message, positives):
-    next_question_message = "Ok, what actors, directors or writers did you have in mind?"
+    next_question_message = "Ok, what genres did you have in mind?"
   else:
     genres = extract_genres(User.id, message)
     if genres:
@@ -463,32 +460,32 @@ def ask_genre_response(bot, message, User):
   setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_crew_response(bot, message, User):
-  skip = False
-  doc = nlp(u"{}".format(message))
-  for token in doc:
-    if token.lower_ == "skip":
-      skip = True
-  if skip or check_for_expected_input(message, positives):
+  skipFlag = False
+  if check_for_expected_input(message, skip):
+      skipFlag = True
+  if skipFlag or check_for_expected_input(message, positives):
     generate_film(bot, User, 0)
+    db.updateSuggestedFilmIndex(User.id, 0)
   elif check_for_expected_input(message, negatives):
     next_question_message = "Ok so do you want the film to have any specific actors, directors or writers?"
     bot.send_message(User.id, next_question_message)
-    setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['FilmSuggestion']['AskCrew'])
+    setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion']['AskCrew'])
     db.removeQueryInfo(User.id, 3)
   else:
-    next_question_message = "Sorry I don't understand, you was these genres or nah?"
+    next_question_message = "Sorry I don't understand, you want this crew member?"
     bot.send_message(User.id, next_question_message)
 
 def ask_crew_response(bot, message, User):
-  skip = False
+  generatedFilm = False
+  skipFlag = False
   next_stage = 'AskCrew'
   next_question_message = 'Sorry, I do not understand, what crew members?'
-  doc = nlp(u"{}".format(message))
-  for token in doc:
-    if token.lower_ == "skip":
-      skip = True
-  if skip or check_for_expected_input(message, negatives):
-    print("Do something like recommend")
+  if check_for_expected_input(message, skip):
+      skipFlag = True
+  if skipFlag or check_for_expected_input(message, negatives):
+    generate_film(bot, User, 0)
+    db.updateSuggestedFilmIndex(User.id, 0)
+    generatedFilm = True
   elif check_for_expected_input(message, positives):
     next_question_message = "ok, what crew members do you want?"
   else:
@@ -504,19 +501,21 @@ def ask_crew_response(bot, message, User):
       crew_names = format_query_info([crew_member[1] for crew_member in crew])
       next_question_message = "So you want the film to have {}?".format(crew_names)
       next_stage = 'ConfirmCrew'
-
-  bot.send_message(User.id, next_question_message)
-  setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
+  if not generatedFilm:
+    bot.send_message(User.id, next_question_message)
+    setUserContextAndStage(User.id, contexts['FilmSuggestion'], stages['filmSuggestion'][next_stage])
 
 def confirm_suggested_film_response(bot, message, User):
+  negative_film_responses.extend(negatives)
   if check_for_expected_input(message, positives):
     db.updateSuggestedFilmStatus(User.id, 1)
     db.removeQueryInfo(User.id)
     bot.send_message(User.id, "Ok, have fun watching the film! Let me know what you thought of it!")
-  elif check_for_expected_input(message, negatives.extend(negative_film_responses)):
-      new_index = User.suggested_film_index + 1
-      generate_film(bot, User, new_index)
-      db.updateSuggestedFilmIndex(User.id, new_index)
+  elif check_for_expected_input(message, negative_film_responses):
+    bot.send_message(User.id, "Ok I am finding a new film that I think you will like.")
+    new_index = User.suggested_film_index + 1
+    generate_film(bot, User, new_index)
+    db.updateSuggestedFilmIndex(User.id, new_index)
   else:
     bot.send_message(User.id, "Sorry I don't understand, is this film fine?")
 
