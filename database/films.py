@@ -13,6 +13,30 @@ def getFilmByID(FilmID):
     finally:
         connection.close()
 
+def getFilmByProcessedName(Name):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT FilmID, Title from `films` WHERE TitlePP = %s""", (Name))
+
+            return cursor.fetchone()
+    except Exception as e:
+        print("Error getting film id by similar name, with name {}".format(Name), str(e))
+    finally:
+        connection.close()
+
+def getFilmBySimilarName(Name):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT FilmID, Title from `films` WHERE TitlePP LIKE %s""", ('%{}%'.format(Name)))
+
+            return cursor.fetchone()
+    except Exception as e:
+        print("Error getting film id by similar name, with name {}".format(Name), str(e))
+    finally:
+        connection.close()
+
 def getAllFilms():
     try:
         connection = connect()

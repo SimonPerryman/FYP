@@ -6,9 +6,9 @@ from surprise.model_selection import cross_validate
 import os.path
 import pandas as pd
 import sys
-sys.path.insert(0, 'C:/dev/projects/University/FYP/database/')
-import userRatings
-from reco_shared import load_pickle, save_pickle
+sys.path.insert(0, 'C:/dev/projects/University/FYP/')
+import database as db
+from .pickle_functions import load_pickle, save_pickle
 
 def calc_algo_mean_score(scores):
     algo_total_score = 0
@@ -24,8 +24,8 @@ def choose_algorithm(dataset):
     return KNNBasic()
 
 def build_collaborative_recommender():
-    userFilmRatings = userRatings.getAllUserRatings()
-    MLFilmRatings = userRatings.getAllMlUserRatings()
+    userFilmRatings = db.getAllUserRatings()
+    MLFilmRatings = db.getAllMlUserRatings()
     userFilmRatings.extend(MLFilmRatings)
     userFilmRatings = pd.DataFrame(userFilmRatings, columns=['MLUR_ID', 'UserID', 'FilmID', 'Liked', 'Rating'])
     userFilmRatings = userFilmRatings.drop(columns=['MLUR_ID', 'Liked'])

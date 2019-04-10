@@ -27,16 +27,28 @@ def insertGenre(genre):
         connection.close()
 
 
-def getAllAlternativeGenreNames(GenreID):
+def getAllAlternativeGenreNamesForGenre(GenreID):
     try:
         connection = connect()
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT * FROM `alternativeGenreNames` WHERE Genre_ID = %s", (GenreID))
-        return cursor.fetchone()
+        return cursor.fetchall()
     except Exception as e:
         print("Error getting all alternative names for genre ID: {}".format(
             GenreID), str(e))
+    finally:
+        connection.close()
+
+def getAllAlternativeGenreNames():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT AlternativeName, Name, genreslist.GenreID FROM `alternativeGenreNames` LEFT JOIN `genresList`
+                                ON genresList.GenreID = alternativeGenreNames.GenreID""")
+        return cursor.fetchall()
+    except Exception as e:
+        print("Error getting all alternative names", str(e))
     finally:
         connection.close()
 
@@ -97,15 +109,14 @@ def getFavouriteGenres(UserID):
         connection = connect()
         # Check does not already exist
         with connection.cursor() as cursor:
-            cursor.execute(
-                """SELECT `GenreID`, `Order` FROM favouriteGenres WHERE UserID = %s""", (UserID))
+            cursor.execute("""SELECT genreslist.GenreID, Name, FavouriteGenres.Order FROM FavouriteGenres
+            LEFT JOIN genresList ON favouriteGenres.GenreID = genresList.GenreID WHERE UserID = %s""", (UserID))
 
         return cursor.fetchall()
     except Exception as e:
         print("Error getting a user's favourite genres:", str(e))
     finally:
         connection.close()
-
 
 def getSpecificFavouriteGenre(UserID, Position):
     try:
@@ -133,13 +144,13 @@ def insertFavouriteGenres(UserID, FavouriteGenre=0,
         with connection.cursor() as cursor:
             if FavouriteGenre != 0:
                 cursor.execute(
-                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 1)""", (FavouriteGenre, UserID))
+                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 1)""", (UserID, FavouriteGenre))
             if SecondFavouriteGenre != 0:
                 cursor.execute(
-                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 2)""", (SecondFavouriteGenre, UserID))
+                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 2)""", (UserID, SecondFavouriteGenre))
             if ThirdFavouriteGenre != 0:
                 cursor.execute(
-                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 3)""", (ThirdFavouriteGenre, UserID))
+                    """INSERT INTO `favouriteGenres` (`UserID`, `GenreID`, `Order`) VALUES (%s, %s, 3)""", (UserID, ThirdFavouriteGenre))
 
         connection.commit()
     except Exception as e:
@@ -185,3 +196,7 @@ def getAllFilmsWithGenreNames():
         print("Error getting all films with their genre names", str(e))
     finally:
         connection.close()
+
+
+if __name__ == "__main__":
+    print(getFavouriteGenres(629604219))

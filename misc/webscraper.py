@@ -1,3 +1,4 @@
+# Code from https://realpython.com/python-web-scraping-practical-introduction/
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
@@ -38,24 +39,19 @@ def log_error(e):
     make it do anything.
     """
     print(e)
-sites = []
-titles = []
-pages = int(712 / 50) + 1
-for i in range(0, pages):
-    page = (50*i) + 1
-    sites.append("https://www.imdb.com/search/title?title_type=feature&keywords=superhero&explore=genres&view=simple&start={}".format(page))
+# End of Code Snippet
 
-for site in sites:
-    raw_html = simple_get(site)
+def get_imdb_film_details(FilmID):
+    details = []
+    raw_html = simple_get("https://www.imdb.com/title/{}".format(FilmID))
     html = BeautifulSoup(raw_html, 'html.parser')
+    for tag in html.find_all("img"):
+        title = tag.attrs.get('title', '')
+        if title and title[-6:] == 'Poster':
+            details.append(tag.attrs.get('src', ''))
+    for tag in html.find_all("div", "summary_text"):
+        details.append(tag.text.strip())
+    return details[0], details[1]
 
-    for p in html.find_all("span", class_='lister-item-header'):
-        for l in p:
-            if str(l).startswith("<span title="):
-                for r in l:
-                    b = str(r)
-                    if b.startswith("<a"):
-                        titles.append(b[(b.find(">") + 1):b.rfind("<")])
-
-    with open('superhero_films.py', 'w', encoding="utf8") as f:
-        f.write(str(titles))
+if __name__ == "__main__":
+    print(get_imdb_film_details("tt0110912"))

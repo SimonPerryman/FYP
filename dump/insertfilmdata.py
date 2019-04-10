@@ -195,9 +195,10 @@ def main():
                 # else:
                 #     formatted[5] = None
                                 # Film ID
+                # formatted.append(re.sub(r"[^\s^\d^\w]", "", formatted[2]).replace(" ", ""))
                 FilmIDs.append(formatted[0])
-                #             # Film ID       #Title          #isAdult    #Year           #runTime
-                # Films.append((formatted[0], formatted[2], int(formatted[4]), formatted[5], formatted[7]))
+                #             # Film ID       #Title          #TitlePP        #isAdult    #Year           #runTime
+                # Films.append((formatted[0], formatted[2], formatted[9], int(formatted[4]), formatted[5], formatted[7]))
                 # genres = formatted[8].split(",")
                 # for genre in genres:
                 #     if genre != "\\n":
