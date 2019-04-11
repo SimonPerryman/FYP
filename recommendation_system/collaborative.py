@@ -8,7 +8,7 @@ import pandas as pd
 import sys
 sys.path.insert(0, 'C:/dev/projects/University/FYP/')
 import database as db
-from .pickle_functions import load_pickle, save_pickle
+from misc import load_pickle, save_pickle
 
 def calc_algo_mean_score(scores):
     algo_total_score = 0

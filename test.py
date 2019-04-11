@@ -5,12 +5,13 @@ nlp = spacy.load('en_core_web_lg')
 # import sys
 # sys.path.insert(0, 'C:/dev/projects/University/FYP/recommendationSystem/')
 # import pandas as pd
-# import numpy as np
+import numpy as np
 from spacy import displacy
 import re
+from nltk import FreqDist
 
 # from create_table import getFilmTable
-# from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 
 # def create_name(token):
 #   name = []
@@ -46,45 +47,107 @@ import re
 #       return doc
 #     print("Test")
 
-def lemmatize_sentence(sentence):
-  doc = nlp(u"{}".format(sentence))
-  return ' '.join([token.lemma_ for token in doc])
+# def lemmatize_sentence(sentence):
+#   doc = nlp(u"{}".format(sentence))
+#   return ' '.join([token.lemma_ for token in doc])
 
-def understand_message(message, l1):
-  lemmatized_message = lemmatize_sentence(message)
-  doc = nlp(u"{}".format(lemmatized_message))
-  for check in l1:
-    check = nlp(u"{}".format(check))
-    check_length = len(check)
-    doc_length = len(doc)
-    if doc_length == check_length:
-      if lemmatized_message == check.text:
-        return True
-    elif doc_length > check_length: 
-      i = 0
-      j = check_length
-      while j <= doc_length:
-        a = doc[i:j]
-        if doc[i:j].text == check.text:
-          return True
-        i += 1
-        j += 1
-    else:
-      i = 0
-      j = doc_length
-      while j <= check_length:
-        if check[i:j].text == doc.text:
-          return True
-        i += 1
-        j += 1
-  return False
+# def understand_message(message, l1):
+#   lemmatized_message = lemmatize_sentence(message)
+#   doc = nlp(u"{}".format(lemmatized_message))
+#   for check in l1:
+#     check = nlp(u"{}".format(check))
+#     check_length = len(check)
+#     doc_length = len(doc)
+#     if doc_length == check_length:
+#       if lemmatized_message == check.text:
+#         return True
+#     elif doc_length > check_length: 
+#       i = 0
+#       j = check_length
+#       while j <= doc_length:
+#         a = doc[i:j]
+#         if doc[i:j].text == check.text:
+#           return True
+#         i += 1
+#         j += 1
+#     else:
+#       i = 0
+#       j = doc_length
+#       while j <= check_length:
+#         if check[i:j].text == doc.text:
+#           return True
+#         i += 1
+#         j += 1
+#   return False
+
+def create_alphabet(dataset):
+    alphabet = set()
+    for message in dataset:
+        doc = nlp(message)
+        for word in doc:
+            alphabet.add(word.text)
+    return list(alphabet)
+
+
+def count_words(dataset, alphabet):
+      # if positive:
+      #     dataset = positive_reviews
+      #     alphabet = positive_alphabet
+      # else:
+      #     dataset = negative_reviews
+      #     alphabet = negative_alphabet
+      # number_of_documents = len(dataset)
+      dataset_vectors = []
+      for doc in dataset:
+          doc = nlp(doc)
+          doc_text = set()
+          for word in doc:
+            doc_text.add(word.text)
+          doc = list(doc_text)
+          alphabet_length = len(alphabet)
+          doc_vector = np.zeros(alphabet_length, dtype="int")
+          for i in range(alphabet_length):
+              if alphabet[i] in doc:
+                  doc_vector[i] = 1
+          dataset_vectors.append(doc_vector)
+      return np.array([vector for vector in dataset_vectors])
 
 def test():
+  reviews = [
+    "film sucked worst film ever",
+    "never seen film bad",
+    "hate film"
+  ]
+  # b = ["film", "sucked", "film"]
+  # a = FreqDist(b)
+  # print(a.most_common(2))
+  # document_vec = count_words(reviews, create_alphabet(reviews))
+  # print(document_vec)
+  # new_doc_vec = np.zeros(document_vec[0].size, dtype="int")
+  # for vector in document_vec:
+  #   new_doc_vec = np.add(new_doc_vec, vector)
+  # print(new_doc_vec)
+  cv = CountVectorizer()
+  document_vectors = cv.fit_transform(reviews)
+  print(document_vectors.vocabulary_.keys())
+  print(cv.get_feature_names())
+  # print(document_vectors.toarray())
+  # cv = CountVectorizer(binary=True)
+  # document_vectors = cv.fit_transform(reviews)
+  # print(document_vectors.toarray())
+
+  # print(cv)
+  # new_reviews = []
+  # for review in reviews:
+  #   doc = nlp(review)
+  #   new_reviews.append(list(set(doc)))
+  # print(new_reviews)
+     
   # print(lemmatize_sentence("I don't want to see this"))
-  doc = nlp(u"Suggest a film written by Tom Cruise")
-  for token in doc:
-    print(True)
-  print(True)
+  # doc = nlp(u"Suggest a film written by Tom Cruise")
+  # for token in doc:
+  #   print(True)
+  # print(True)
   # displacy.serve(doc, style="dep")
   # doc = nlp(u"yes but also add superman. yes but remove superman. yes but add superman and remove spiderman. yes but replace spiderman with superman")
   # displacy.serve(doc, style="dep")
