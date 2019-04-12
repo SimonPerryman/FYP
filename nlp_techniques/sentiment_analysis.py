@@ -20,61 +20,124 @@ class Classifier():
         self.alpha = 1
 
     def create_doc_vectors(self, positive, binary):
+        """Calcuates the document vector for each individual document in the dataset, and then
+        combines each individual vector to create a document vector for the dataset. Also stores
+        the alphabet for the dataset.
+        @param {Boolean} positive - whether to use the positive or negative dataset
+        @param {Boolean} binary - whether to calculate the occurence of each word, or presence
+                                  of each word in the dataset
+        @returns {Numpy Array} dataset_vector"""
         dataset = self.positive_reviews if positive else self.negative_reviews
         cv = CountVectorizer(binary=binary)
         document_vectors = cv.fit_transform(dataset).toarray()
         dataset_vector = np.zeros(document_vectors[0].size, dtype="int")
         for vector in document_vectors:
             dataset_vector = np.add(dataset_vector, vector)
-        dataset_words = {}
-        for index, word in enumerate(cv.get_feature_names()):
-            dataset_words[word] = dataset_vector[index]
-        return dataset_vector, cv.get_feature_names()       
+        if not binary:
+            if positive:
+                self.pos_alphabet = cv.get_feature_names()
+                self.pos_alphabet_length = len(self.pos_alphabet)
+            else:
+                self.neg_alphabet = cv.get_feature_names()
+                self.neg_alphabet_length = len(self.neg_alphabet)
+        return dataset_vector
 
-    def calcuate_IDF_matrix(self, positive):
-        dataset = self.positive_reviews if positive else self.negative_reviews
-        dataset_vector, alphabet = self.create_doc_vectors(positive, True)
-        number_of_documents = len(dataset)
-        idf_matrix = np.zeros(len(alphabet))
-        for index in range(len(alphabet)):
-            idf_matrix[index] = log10(dataset_vector[index] / number_of_documents)
-        return idf_matrix
-    
-    def calculate_TF_matrix(self, positive):
-        dataset_vector, alphabet = self.create_doc_vectors(positive, False)
-        alphabet_length = len(alphabet)
-        tf_matrix = np.zeros(len(alphabet))
-        for index in range(alphabet_length):
-            tf_matrix[index] = dataset_vector[index] / alphabet_length
-        return tf_matrix
+    def calculate_TF_vectors(self):
+        """Calculates the positive and negative term frequency vectors for the whole dataset"""
+        self.pos_tf_vector = self.create_doc_vectors(positive=True, binary=False)
+        self.neg_tf_vector = self.create_doc_vectors(positive=False, binary=True)
 
-    def calculate_TF_IDF_matrix(self, positive):
-        tf_matrix = self.calculate_TF_matrix(positive)
-        idf_matrix = self.calcuate_IDF_matrix(positive)
-        sum_of_all_words_tf_idf = np.add.reduce(tf_matrix * idf_matrix, 0)
-        vector_size = tf_matrix.size
-        tf_idf_matrix = np.zeros(vector_size)
-        for index in range(vector_size):
+    def calculate_IDF_vectors(self):
+        """Calcuates the positive and negative inverse document frequency vectors for the
+        whole dataset"""
+        self.pos_idf_vector = self.create_doc_vectors(positive=True, binary=True)
+        self.neg_idf_vector = self.create_doc_vectors(positive=False, binary=True)
 
-            tf_idf_matrix[index] = ((tf_matrix[index] * idf_matrix[index]) + self.alpha) / (sum_of_all_words_tf_idf + (sum_of_all_words_tf_idf * self.alpha))
-        return tf_idf_matrix
+    def calculate_TF_IDF(self):
+        """Calcuates the Term Frequency Inverse Document Frequency values for the whole
+        dataset"""
+        self.calculate_TF_vectors()
+        self.calculate_IDF_vectors()
+        self.total_alphabet = list(set(self.pos_alphabet + self.neg_alphabet))
+        self.total_alphabet_length = len(self.total_alphabet)
+        self.pos_tf_labelled = {}
+        self.neg_tf_labelled = {}
+        self.pos_idf_labelled = {}
+        self.neg_idf_labelled = {}
+        self.total_idf_labelled = {}
+
+        # Fills dict with words and their respective tf or idf values
+        for index, word in enumerate(self.pos_alphabet):
+            self.pos_tf_labelled[word] = self.pos_tf_vector[index]
+            self.pos_idf_labelled[word] = self.pos_idf_vector[index]
+        for index, word in enumerate(self.neg_alphabet):
+            self.neg_tf_labelled[word] = self.neg_tf_vector[index]
+            self.neg_idf_labelled[word] = self.neg_idf_vector[index]
+
+        # IDF for both datasets combined
+        for word in self.total_alphabet:
+            occurs_in_both_datasets = self.pos_idf_labelled.get(word, 0) + self.neg_idf_labelled.get(word, 0)
+            self.total_idf_labelled[word] = log10(self.total_alphabet_length / occurs_in_both_datasets)
+
+        self.pos_tf_idf = {}
+        self.neg_tf_idf = {}
+        self.sum_pos_tf_idf = 0
+        self.sum_neg_tf_idf = 0
+
+        # Calculates TF (x in pos or neg) * IDF(x of all documents) and the sum of all those values
+        for word in self.pos_tf_labelled:
+            self.pos_tf_idf[word] = self.pos_tf_labelled[word] * self.total_idf_labelled[word] #Z
+            self.sum_pos_tf_idf += self.pos_tf_idf[word]
+        for word in self.neg_tf_labelled:
+            self.neg_tf_idf[word] = self.neg_tf_labelled[word] * self.total_idf_labelled[word] #Z
+            self.sum_neg_tf_idf += self.neg_tf_idf[word]
+
+    def calculate_probability_values(self):
+        """Calcuates the probability of the word appearing in the positive and negative reviews,
+        with the addition of the alpha value (default: laplace smoothing)"""
+        self.prob_pos = {}
+        self.prob_neg = {}
+        for word in self.pos_tf_idf:
+            self.prob_pos[word] = (self.pos_tf_idf[word] + self.alpha) / (self.sum_pos_tf_idf * (self.alpha * self.pos_alphabet_length))
+        for word in self.neg_tf_idf:
+            self.prob_neg[word] = (self.neg_tf_idf[word] + self.alpha) / (self.sum_neg_tf_idf * (self.alpha * self.neg_alphabet_length))
 
     def train(self):
-        self.positive_tf_idf_matrix = self.calculate_TF_IDF_matrix(True)
-        self.negative_tf_idf_matrix = self.calculate_TF_IDF_matrix(False)
+        self.calculate_TF_IDF()
+        self.calculate_probability_values()
 
     def classify(self, review):
-        print("review")
+        """Calculate the probability a review is positive or negative
+        @param {SpaCy Document} Review
+        @returns {Boolean} True if review is predicted as negative, False if positive"""
+        prob_neg = 0
+        prob_pos = 0
+        for token in review:
+            text = token.text
+            if text in self.prob_pos:
+                prob_pos += log10(self.prob_pos[text]) - log10(self.sum_pos_tf_idf * (self.alpha * self.pos_alphabet_length))
+            if text in self.prob_neg:
+                prob_neg += log10(self.prob_neg[text]) - log10(self.sum_neg_tf_idf * (self.alpha * self.neg_alphabet_length))
+        return prob_neg >= prob_pos
 
-
+    def test(self, testingData):
+        """Tests the classifier using the testing set.
+        @param {List} testingData - list of tuples: (review, category)
+        @returns {List} testing_results - list of tuples: (category, prediction)"""
+        testing_results = []
+        for review, category in testingData:
+            prediction = self.classify(review)
+            testing_results.append((category, prediction))
+        return testing_results
+        
 def sentiment_analysis():
-    if os.path.isfile('two_reviews_each.pkl'):
-        reviews = load_pickle('two_reviews_each.pkl')
-    else:
-        reviews = [(preprocess_reviews(list(movie_reviews.words(fileid))), category)
-              for category in movie_reviews.categories()
-              for fileid in movie_reviews.fileids(category)[:2]]
-        save_pickle(reviews, 'two_reviews_each.pkl')
+    # if os.path.isfile('two_reviews_each.pkl'):
+        # reviews = load_pickle('two_reviews_each.pkl')
+    # else:
+    reviews = [(preprocess_reviews(list(movie_reviews.words(fileid))), category)
+            for category in movie_reviews.categories()
+            for fileid in movie_reviews.fileids(category)[:10]]
+    save_pickle(reviews, 'five_reviews_each.pkl')
     senti = Classifier(reviews)
     senti.train()
         
