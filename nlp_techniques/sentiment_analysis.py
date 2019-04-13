@@ -1,6 +1,6 @@
 from nltk.corpus import movie_reviews
 from random import shuffle
-from preprocessing import preprocess_reviews
+from preprocessing import preprocess_reviews, preprocess_reviews_keep_stop_words
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
@@ -17,6 +17,9 @@ class Classifier():
     def __init__(self, trainingData):
         self.positive_reviews = [review_information[0] for review_information in trainingData if review_information[1] == 'pos']
         self.negative_reviews = [review_information[0] for review_information in trainingData if review_information[1] == 'neg']
+        self.total_reviews = len(self.positive_reviews) + len(self.negative_reviews)
+        self.prob_pos_review = len(self.positive_reviews) / self.total_reviews
+        self.prob_neg_review = len(self.negative_reviews) / self.total_reviews
         self.alpha = 1
 
     def create_doc_vectors(self, positive, binary):
@@ -28,7 +31,7 @@ class Classifier():
                                   of each word in the dataset
         @returns {Numpy Array} dataset_vector"""
         dataset = self.positive_reviews if positive else self.negative_reviews
-        cv = CountVectorizer(binary=binary)
+        cv = CountVectorizer(binary=binary, ngram_range=(1,2))
         document_vectors = cv.fit_transform(dataset).toarray()
         dataset_vector = np.zeros(document_vectors[0].size, dtype="int")
         for vector in document_vectors:
@@ -45,7 +48,7 @@ class Classifier():
     def calculate_TF_vectors(self):
         """Calculates the positive and negative term frequency vectors for the whole dataset"""
         self.pos_tf_vector = self.create_doc_vectors(positive=True, binary=False)
-        self.neg_tf_vector = self.create_doc_vectors(positive=False, binary=True)
+        self.neg_tf_vector = self.create_doc_vectors(positive=False, binary=False)
 
     def calculate_IDF_vectors(self):
         """Calcuates the positive and negative inverse document frequency vectors for the
@@ -86,10 +89,10 @@ class Classifier():
 
         # Calculates TF (x in pos or neg) * IDF(x of all documents) and the sum of all those values
         for word in self.pos_tf_labelled:
-            self.pos_tf_idf[word] = self.pos_tf_labelled[word] * self.total_idf_labelled[word] #Z
+            self.pos_tf_idf[word] = self.pos_tf_labelled[word] * self.total_idf_labelled[word]
             self.sum_pos_tf_idf += self.pos_tf_idf[word]
         for word in self.neg_tf_labelled:
-            self.neg_tf_idf[word] = self.neg_tf_labelled[word] * self.total_idf_labelled[word] #Z
+            self.neg_tf_idf[word] = self.neg_tf_labelled[word] * self.total_idf_labelled[word]
             self.sum_neg_tf_idf += self.neg_tf_idf[word]
 
     def calculate_probability_values(self):
@@ -109,16 +112,17 @@ class Classifier():
     def classify(self, review):
         """Calculate the probability a review is positive or negative
         @param {SpaCy Document} Review
-        @returns {Boolean} True if review is predicted as negative, False if positive"""
+        @returns {String} neg if predicted as negative, pos if predicted as pos"""
         prob_neg = 0
         prob_pos = 0
-        for token in review:
+        for token in nlp(review):
             text = token.text
             if text in self.prob_pos:
-                prob_pos += log10(self.prob_pos[text]) - log10(self.sum_pos_tf_idf * (self.alpha * self.pos_alphabet_length))
+                prob_pos += log10(self.prob_pos[text]) - log10(self.sum_pos_tf_idf * (self.alpha * self.pos_alphabet_length)) + log10(self.prob_pos_review)
             if text in self.prob_neg:
-                prob_neg += log10(self.prob_neg[text]) - log10(self.sum_neg_tf_idf * (self.alpha * self.neg_alphabet_length))
-        return prob_neg >= prob_pos
+                prob_neg += log10(self.prob_neg[text]) - log10(self.sum_neg_tf_idf * (self.alpha * self.neg_alphabet_length)) + log10(self.prob_neg_review)
+        score = prob_pos - prob_neg
+        return ('neg', score) if prob_neg >= prob_pos else ('pos', score)
 
     def test(self, testingData):
         """Tests the classifier using the testing set.
@@ -129,18 +133,47 @@ class Classifier():
             prediction = self.classify(review)
             testing_results.append((category, prediction))
         return testing_results
-        
+
 def sentiment_analysis():
-    # if os.path.isfile('two_reviews_each.pkl'):
-        # reviews = load_pickle('two_reviews_each.pkl')
-    # else:
-    reviews = [(preprocess_reviews(list(movie_reviews.words(fileid))), category)
-            for category in movie_reviews.categories()
-            for fileid in movie_reviews.fileids(category)[:10]]
-    save_pickle(reviews, 'five_reviews_each.pkl')
-    senti = Classifier(reviews)
-    senti.train()
+
+    if os.path.isfile('movie_reviews_no_digits_not_stop.pkl'):
+        reviews = load_pickle('movie_reviews_no_digits_not_stop.pkl')
+    else:
+        reviews = [(preprocess_reviews_keep_stop_words(list(movie_reviews.words(fileid))), category)
+                for category in movie_reviews.categories()
+                for fileid in movie_reviews.fileids(category)]
+        save_pickle(reviews, 'movie_reviews_no_digits_not_stop.pkl')
+
+    shuffle(reviews)
+    trainset = reviews[:1600]
+    testset = reviews[1600:]
+    filmClassifier = Classifier(trainset)
+    filmClassifier.train()
+    results = filmClassifier.test(testset)
+    correct = 0
+    false_positive = 0
+    false_negative = 0
+    correct_score = 0
+    false_pos_score = 0
+    false_neg_score = 0
+    for result in results:
+        if result[0] == result[1][0]:
+            correct += 1
+            correct_score += result[1][1]
+        elif result[0] == 'pos' and result[1][0] == 'neg':
+            false_negative += 1
+            false_neg_score += result[1][1]
+        else:
+            false_positive +=1
+            false_pos_score += result[1][1]
+
+    print("Correct", correct, "percentage:", correct / 400, "avg score", correct_score / correct)
+    print("False Positive", false_positive, "false_pos_score", false_pos_score / false_positive)
+    print("False negative", false_negative, "false_neg_score", false_neg_score / false_negative)
+    print("STOP")
+    save_pickle(filmClassifier, "filmClassifier.pkl")
         
+
     return True
 
 
