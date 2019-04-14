@@ -1,10 +1,12 @@
 import pandas as pd
 from misc import load_pickle
-from .create_table import getFilmTable
+from create_table import getFilmTable
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # import os.path
+# Built using "Hands-On Recommendation Systems with Python: Start building powerful and personalized, recommendation engines with Python
+# (Rounak Banik 2018)" as base frame
 
 def generate_cosine_sim(filmsTable=None):
     if filmsTable is None:
@@ -23,9 +25,9 @@ def content_recommender(FilmID, filmsTable):
 
     filmIndex = int(filmsTable[(filmsTable['FilmID'] == FilmID)].index.values)
 
-    film_sim_scores = list(enumerate(cosine_sim[filmIndex][1:]))
+    film_sim_scores = list(enumerate(cosine_sim[filmIndex]))
 
-    film_sim_scores = sorted(film_sim_scores, key=sort_sim_scores, reverse=True)
+    film_sim_scores = sorted(film_sim_scores, key=sort_sim_scores, reverse=True)[1:]
 
     splice = 25
     if len(film_sim_scores) < 25:

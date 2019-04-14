@@ -1,5 +1,5 @@
 from db_connection import connect
-from shared import preprocess_string
+from nlp_techniques import preprocess_string
 
 def insertFilmDB(Films):
     try:

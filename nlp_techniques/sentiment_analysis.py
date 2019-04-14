@@ -2,8 +2,6 @@ from nltk.corpus import movie_reviews
 from random import shuffle
 from preprocessing import preprocess_reviews, preprocess_reviews_keep_stop_words
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
-import pandas as pd
 import spacy
 import numpy as np
 import os.path
@@ -134,22 +132,7 @@ class Classifier():
             testing_results.append((category, prediction))
         return testing_results
 
-def sentiment_analysis():
-
-    if os.path.isfile('movie_reviews_no_digits_not_stop.pkl'):
-        reviews = load_pickle('movie_reviews_no_digits_not_stop.pkl')
-    else:
-        reviews = [(preprocess_reviews_keep_stop_words(list(movie_reviews.words(fileid))), category)
-                for category in movie_reviews.categories()
-                for fileid in movie_reviews.fileids(category)]
-        save_pickle(reviews, 'movie_reviews_no_digits_not_stop.pkl')
-
-    shuffle(reviews)
-    trainset = reviews[:1600]
-    testset = reviews[1600:]
-    filmClassifier = Classifier(trainset)
-    filmClassifier.train()
-    results = filmClassifier.test(testset)
+def analysis(results):
     correct = 0
     false_positive = 0
     false_negative = 0
@@ -168,8 +151,26 @@ def sentiment_analysis():
             false_pos_score += result[1][1]
 
     print("Correct", correct, "percentage:", correct / 400, "avg score", correct_score / correct)
-    print("False Positive", false_positive, "false_pos_score", false_pos_score / false_positive)
-    print("False negative", false_negative, "false_neg_score", false_neg_score / false_negative)
+    print("False Positive", false_positive, "avg false_pos_score", false_pos_score / false_positive)
+    print("False negative", false_negative, "avg false_neg_score", false_neg_score / false_negative)
+
+def sentiment_analysis():
+
+    if os.path.isfile('movie_reviews_no_digits_not_stop.pkl'):
+        reviews = load_pickle('movie_reviews_no_digits_not_stop.pkl')
+    else:
+        reviews = [(preprocess_reviews_keep_stop_words(list(movie_reviews.words(fileid))), category)
+                for category in movie_reviews.categories()
+                for fileid in movie_reviews.fileids(category)]
+        save_pickle(reviews, 'movie_reviews_no_digits_not_stop.pkl')
+
+    shuffle(reviews)
+    trainset = reviews[:1600]
+    testset = reviews[1600:]
+    filmClassifier = Classifier(trainset)
+    filmClassifier.train()
+    results = filmClassifier.test(testset)
+    analysis(results)
     print("STOP")
     save_pickle(filmClassifier, "filmClassifier.pkl")
         

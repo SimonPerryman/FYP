@@ -1,5 +1,3 @@
-import re
-
 def getGenre(genre):
     return {
         'action': 1,
@@ -31,6 +29,3 @@ def getGenre(genre):
         'war': 28,
         'western': 29
     }.get(genre, None)
-
-def preprocess_string(string):
-    return re.sub(r"[^\s^\d^\w]", "", string.lower()).replace(" ", "")

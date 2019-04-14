@@ -1,6 +1,6 @@
-from .collaborative import collaborative_recommender
-from .content import content_recommender
-from .create_table import getFilmTable
+from collaborative import collaborative_recommender
+from content import content_recommender
+from create_table import getFilmTable
 from random import shuffle, randint
 import pandas as pd
 import sys
@@ -157,7 +157,7 @@ def hybrid_recommender(User):
     @returns {Series} Top 25 Film Titles and respective FilmIDs"""
     filmsTable, requested_filmID = build_tailored_films_table(User)
    
-    collaborative_result = collaborative_recommender(User.id)
+    collaborative_result = collaborative_recommender()
     content_result = content_recommender(requested_filmID, filmsTable)
     film_predictions = []
     for FilmID in content_result['FilmID']:

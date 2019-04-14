@@ -296,8 +296,8 @@ def extract_crew(UserID, message):
   
 
 def extract_data(bot, message, User):
-  """Calls the functions to search for the genre, film and crew information
-  and inserts the relevant information into the database.
+  """Stage 1 Response. Calls the functions to search for the genre, film and
+  crew information and inserts the relevant information into the database.
   @param {Bot} bot
   @param {String} message
   @param {Person} User"""

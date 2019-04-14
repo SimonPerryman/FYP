@@ -1,3 +1,4 @@
+import re
 import spacy
 nlp = spacy.load('en_core_web_lg')
 
@@ -7,6 +8,13 @@ def lemmatize_sentence(sentence):
   @returns {String} lemmatized sentence"""
   doc = nlp(u"{}".format(sentence.lower()))
   return ' '.join([token.lemma_ for token in doc])
+
+def preprocess_string(string):
+    """Removes all a lowercase string with all characters which are not a word, digit or whitespace
+    are removed.
+    @param {String} string
+    @returns {String} preprocessed string"""
+    return re.sub(r"[^\s^\d^\w]", "", string.lower()).replace(" ", "")
 
 def preprocess_reviews(review):
     """Preprocesses reviews, removing all stopwords, digits, punctuations and singular letter words
