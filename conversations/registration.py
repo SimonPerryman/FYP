@@ -1,7 +1,25 @@
 import telegram
 from context import stages, contexts
-from database import getAllGenres, insertFavouriteGenres, setUserContextAndStage, updateUserAge
+import botAssets
+from time import time
+import random
+from database import (getAllGenres, insertFavouriteGenres, setUserContextAndStage, updateUserAge,
+                     insertUser, newConversation)
 from .errors import errorMessage
+
+def start(bot, update):
+    insertUser(update.message.chat.id, update.message.chat.first_name, update.message.chat.last_name)
+    newConversation(update.message.chat.id, {
+        "MessageID": random.randint(0, 99999999),
+        "Message": update.message.text,
+        "Timestamp": int(time())
+    })
+    genres_keyboard = botAssets.genresKeyboard()
+    reply_markup = telegram.ReplyKeyboardMarkup(genres_keyboard)
+    bot.send_message(chat_id=update.message.chat_id,
+                    text="""Hey {}! Thanks for talking to me, I haven't spoken to anyone in a while! I'm really interested in films.
+                    My favourite genre is comedy, what's yours?""".format(update.message.chat.first_name), 
+                    reply_markup=reply_markup)
 
 def askSecondFavouriteGenre(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Awesome. What's your next favourite genre?! Mine's Superhero films :)")

@@ -19,21 +19,7 @@ config.read("./config/config.ini")
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=config.getint("settings", "logging_level"))
                     
-def start(bot, update):
-    insertUser(update.message.chat.id, update.message.chat.first_name, update.message.chat.last_name)
-    newConversation(update.message.chat.id, {
-        "MessageID": random.randint(0, 99999999),
-        "Message": update.message.text,
-        "Timestamp": int(time())
-    })
-    genres_keyboard = botAssets.genresKeyboard()
-    reply_markup = telegram.ReplyKeyboardMarkup(genres_keyboard)
-    bot.send_message(chat_id=update.message.chat_id,
-                    text="""Hey {}! Thanks for talking to me, I haven't spoken to anyone in a while! I'm really interested in films.
-                    My favourite genre is comedy, what's yours?""".format(update.message.chat.first_name), 
-                    reply_markup=reply_markup)
-
-start_handler = CommandHandler('start', start)
+start_handler = CommandHandler('start', conversations.start)
 update_genre_handler = CommandHandler('ufg', commands.updateGenre, pass_args=True)
 greetings_handler = MessageHandler(botAssets.GreetingFilter(), conversations.greetings)
 conversation_handler = MessageHandler(Filters.text, conversations.conversation_handler)
