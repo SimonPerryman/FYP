@@ -7,8 +7,6 @@ cffi==1.12.2
 chardet==3.0.4
 cryptography==2.6.1
 cymem==2.0.2
-en-core-web-lg==2.1.0
-en-core-web-sm==2.1.0
 future==0.17.1
 idna==2.8
 joblib==0.13.2
@@ -40,3 +38,5 @@ thinc==7.0.4
 tqdm==4.31.1
 urllib3==1.24.1
 wasabi==0.2.1
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.1.0/en_core_web_sm-2.1.0.tar.gz
+https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-2.1.0/en_core_web_lg-2.1.0.tar.gz
