@@ -114,3 +114,6 @@ venv.bak/
 # Pickle Files
 *.pickle
 *.pkl
+
+# Spacy Models
+spacy_models/*

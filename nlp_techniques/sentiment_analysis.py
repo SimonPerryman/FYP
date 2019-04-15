@@ -9,7 +9,7 @@ from math import log10
 import sys
 sys.path.insert(0, 'C:/dev/projects/University/FYP/')
 from misc import load_pickle, save_pickle
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load(r"C:\dev\projects\University\FYP\spacy_models\en_core_web_sm")#("en_core_web_sm")
 
 class Classifier():
     def __init__(self, trainingData):

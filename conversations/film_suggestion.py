@@ -9,7 +9,7 @@ from nlp_techniques import lemmatize_sentence
 # sys.path.insert(0, 'C:/dev/projects/University/FYP/')
 from misc import get_imdb_film_details
 from botAssets import positives, negatives, negative_film_responses, skip
-nlp = spacy.load('en_core_web_lg')
+nlp = spacy.load(r'C:\dev\projects\University\FYP\spacy_models\en_core_web_lg')
 
 def generate_film(bot, User, index):
   """Generates a suggested film for the user using the query information

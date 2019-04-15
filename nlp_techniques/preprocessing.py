@@ -1,6 +1,6 @@
 import re
 import spacy
-nlp = spacy.load('en_core_web_lg')
+nlp = spacy.load(r'C:\dev\projects\University\FYP\spacy_models\en_core_web_lg')
 
 def lemmatize_sentence(sentence):
   """Returns a lemmatized version of a sentence
