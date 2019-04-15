@@ -1,6 +1,6 @@
-from collaborative import collaborative_recommender
-from content import content_recommender
-from create_table import getFilmTable
+from .collaborative import collaborative_recommender
+from .content import content_recommender
+from .create_table import getFilmTable
 from random import shuffle, randint
 import pandas as pd
 import sys

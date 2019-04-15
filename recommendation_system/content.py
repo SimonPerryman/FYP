@@ -1,6 +1,6 @@
 import pandas as pd
 from misc import load_pickle
-from create_table import getFilmTable
+from .create_table import getFilmTable
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 

@@ -1,7 +1,4 @@
-from surprise import SVD
-from surprise import KNNBasic
-from surprise import Dataset
-from surprise import Reader
+from surprise import SVD, KNNBasic, Dataset, Reader
 from surprise.model_selection import cross_validate
 import os.path
 import pandas as pd

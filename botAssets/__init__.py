@@ -1,3 +1,3 @@
-from .filters import GreetingFilter, wipFilter
+from .filters import GreetingFilter
 from .keyboards import genresKeyboard
 from .inputs import *

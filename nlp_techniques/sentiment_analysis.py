@@ -1,6 +1,6 @@
 from nltk.corpus import movie_reviews
 from random import shuffle
-from preprocessing import preprocess_reviews, preprocess_reviews_keep_stop_words
+from .preprocessing import preprocess_reviews, preprocess_reviews_keep_stop_words
 from sklearn.feature_extraction.text import CountVectorizer
 import spacy
 import numpy as np
@@ -154,7 +154,7 @@ def analysis(results):
     print("False Positive", false_positive, "avg false_pos_score", false_pos_score / false_positive)
     print("False negative", false_negative, "avg false_neg_score", false_neg_score / false_negative)
 
-def sentiment_analysis():
+def sentiment_analysis(review):
 
     if os.path.isfile('movie_reviews_no_digits_not_stop.pkl'):
         reviews = load_pickle('movie_reviews_no_digits_not_stop.pkl')
@@ -179,4 +179,4 @@ def sentiment_analysis():
 
 
 if __name__ == "__main__":
-    print(sentiment_analysis())
+    print(sentiment_analysis("review"))
