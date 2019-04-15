@@ -493,12 +493,14 @@ def confirm_crew_response(bot, message, User):
     db.removeQueryInfo(User.id, 3)
   else:
     db_query = db.getQueryInfo(User.id, 3)
-    crew_name = ''
+    crew_names = []
     if db_query:
-      crew_name = db.getCrewByID(db_query['Information'])['Name']
+      for result in db_query:
+        crew_names.append(db.getCrewByID(result['Information'])['Name'])
+      crew_names = format_query_info(crew_names)
     next_question_message = "Sorry I don't understand."
-    if crew_name:
-      next_question_message = next_question_message + " Did you want a film similar to {}".format(crew_name)
+    if crew_names:
+      next_question_message = next_question_message + " Did you want a film with {}?".format(crew_names)
     bot.send_message(User.id, next_question_message)
 
 def ask_crew_response(bot, message, User):
