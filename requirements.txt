@@ -25,7 +25,6 @@ python-telegram-bot==11.1.0
 pytz==2019.1
 requests==2.21.0
 scikit-learn==0.20.3
-scikit-surprise==1.0.6
 scipy==1.2.1
 singledispatch==3.4.0.3
 six==1.12.0
