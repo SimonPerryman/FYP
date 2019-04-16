@@ -32,7 +32,6 @@ sklearn==0.0
 soupsieve==1.9.1
 spacy==2.1.3
 srsly==0.0.5
-surprise==0.1
 thinc==7.0.4
 tqdm==4.31.1
 urllib3==1.24.1
