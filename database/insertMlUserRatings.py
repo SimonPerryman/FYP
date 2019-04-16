@@ -1,4 +1,4 @@
-from db_connection import connect
+from .db_connection import connect
 import films
 import pandas as pd
 import math

@@ -1,9 +1,9 @@
 from surprise import SVD, KNNBasic, Dataset, Reader
 from surprise.model_selection import cross_validate
-import os.path
+import os
 import pandas as pd
 import sys
-sys.path.insert(0, 'C:/dev/projects/University/FYP/')
+sys.path.insert(0, os.environ['APPLICATION_PATH'])
 import database as db
 from misc import load_pickle, save_pickle
 

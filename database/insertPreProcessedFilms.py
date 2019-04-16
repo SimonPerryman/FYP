@@ -1,4 +1,4 @@
-from db_connection import connect
+from .db_connection import connect
 from nlp_techniques import preprocess_string
 
 def insertFilmDB(Films):

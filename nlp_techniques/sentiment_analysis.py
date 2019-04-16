@@ -4,13 +4,14 @@ from .preprocessing import preprocess_reviews, preprocess_reviews_keep_stop_word
 from sklearn.feature_extraction.text import CountVectorizer
 import spacy
 import numpy as np
-import os.path
+import os
 from math import log10
 import sys
-sys.path.insert(0, 'C:/dev/projects/University/FYP/')
+sys.path.insert(0, os.environ['APPLICATION_PATH'])
 from misc import load_pickle, save_pickle
-nlp = spacy.load(r"C:\dev\projects\University\FYP\spacy_models\en_core_web_sm")#("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm")
 
+# Based on https://github.com/tejank10/Spam-or-Ham/blob/master/spam_ham.ipynb
 class Classifier():
     def __init__(self, trainingData):
         self.positive_reviews = [review_information[0] for review_information in trainingData if review_information[1] == 'pos']
@@ -173,7 +174,6 @@ def sentiment_analysis(review):
     analysis(results)
     print("STOP")
     save_pickle(filmClassifier, "filmClassifier.pkl")
-        
 
     return True
 

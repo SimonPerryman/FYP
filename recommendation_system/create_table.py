@@ -1,7 +1,7 @@
 import pandas as pd
 import sys
-sys.path.insert(0, 'C:/dev/projects/University/FYP/') #TODO Make this an environment variable
-import os.path
+import os
+sys.path.insert(0, os.environ['APPLICATION_PATH'])
 import database as db
 
 def check_film_table_exists():
@@ -129,3 +129,4 @@ def getFilmTable():
 
 if __name__ == "__main__":
     create_film_table()
+ 

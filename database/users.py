@@ -1,10 +1,8 @@
 import time
 import sys
-sys.path.insert(0, 'C:/dev/projects/University/FYP/database/')
-sys.path.insert(0, 'C:/dev/projects/University/FYP/')
 
-from db_connection import connect
-from context import contexts, stages, getStage
+from .db_connection import connect
+from .context import contexts, stages, getStage
 
 def insertUser(UserID, FirstName, LastName):
     try:

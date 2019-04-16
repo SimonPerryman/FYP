@@ -1,10 +1,9 @@
 import telegram
-from context import stages, contexts
 import botAssets
 from time import time
 import random
 from database import (getAllGenres, insertFavouriteGenres, setUserContextAndStage, updateUserAge,
-                     insertUser, newConversation)
+                     insertUser, newConversation, stages, contexts)
 from .errors import errorMessage
 
 def start(bot, update):

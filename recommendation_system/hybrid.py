@@ -4,7 +4,8 @@ from .create_table import getFilmTable
 from random import shuffle, randint
 import pandas as pd
 import sys
-sys.path.insert(0, 'C:/dev/projects/University/FYP/')
+import os
+sys.path.insert(0, os.environ['APPLICATION_PATH'])
 from database import getQueryInfo, getUserRatings
 
 def sort_by_highest_imdb_score(filmsTable=None):

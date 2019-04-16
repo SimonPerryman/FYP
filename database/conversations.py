@@ -1,9 +1,5 @@
 from pymongo import MongoClient
-from configparser import ConfigParser
 import random
-
-config = ConfigParser()
-config.read("../config/config.ini")
 
 client = MongoClient()
 

@@ -1,8 +1,11 @@
+from environment_variables import add_environment_variables
+add_environment_variables()
+
 # Default Python Packages
 import logging
 import random
+import os
 from time import time
-from configparser import ConfigParser
 
 # Third Party Libraries
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -14,10 +17,7 @@ import conversations
 import botAssets
 import commands
 
-config = ConfigParser()
-config.read("./config/config.ini")
-
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=config.getint("settings", "logging_level"))
+logging.basicConfig(format=os.environ['LOGGING_FORMAT'], level=int(os.environ['LOGGING_LEVEL']))
                     
 start_handler = CommandHandler('start', conversations.start)
 update_genre_handler = CommandHandler('ufg', commands.updateGenre, pass_args=True)
@@ -26,7 +26,7 @@ conversation_handler = MessageHandler(Filters.text, conversations.conversation_h
 echo_handler = MessageHandler(Filters.text, conversations.echo)
 
 def main():
-    updater = Updater(token=config.get("bot", "token"))
+    updater = Updater(token=os.environ['BOT_TOKEN'])
     dispatcher = updater.dispatcher
 
     # Commands

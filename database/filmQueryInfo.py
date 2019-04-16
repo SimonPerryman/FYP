@@ -1,4 +1,4 @@
-from db_connection import connect
+from .db_connection import connect
 
 def insertQueryInformation(UserID, Information, Type):
     try:

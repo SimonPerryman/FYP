@@ -66,7 +66,7 @@ def get_train_data():
 
 # From https://github.com/explosion/spaCy/blob/master/examples/training/train_ner.py
 def train_model():
-    nlp = spacy.load(r'C:\dev\projects\University\FYP\spacy_models\en_core_web_lg')
+    nlp = spacy.load('en_core_web_lg')
     ner = nlp.get_pipe("ner")
 
     train_data = get_train_data()
