@@ -5,7 +5,7 @@ def connect():
     """Checks to see if it is in the hosted environment, and if so connects
     to the hosted DB, else use the local DB"""
     if 'RDS_HOSTNAME' in os.environ:
-        return pymysql.connect(host = os.environ['RDS_HOSTNAMe'],
+        return pymysql.connect(host = os.environ['RDS_HOSTNAME'],
                              user = os.environ['RDS_USERNAME'],
                              password = os.environ['RDS_PASSWORD'],
                              db = os.environ['DB_NAME'],
