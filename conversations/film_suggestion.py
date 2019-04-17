@@ -7,7 +7,7 @@ from recommendation_system import hybrid_recommender
 from nlp_techniques import lemmatize_sentence
 from misc import get_imdb_film_details
 from botAssets import positives, negatives, negative_film_responses, skip
-nlp = spacy.load('en_core_web_lg')
+nlp = spacy.load('en_core_web_sm')
 
 def generate_film(bot, User, index):
   """Generates a suggested film for the user using the query information

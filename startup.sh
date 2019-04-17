@@ -1,9 +1,9 @@
 #!/bin/bash
 
-sudo python3 -m pip install --upgrade pip
-sudo python3 -m pip install -r requirements.txt
-sudo python3 -m pip install scikit-surprise
-sudo python3 -m spacy download en_core_web_sm
-sudo python3 -m spacy download en_core_web_lg
-sudo source /opt/python/current/env
-sudo python3 application.py
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m pip install scikit-surprise
+python -m spacy download en_core_web_sm
+python -m spacy download en_core_web_lg
+env_var=$(sed -e 's/export //' -e 's/"//g' /opt/python/current/env)
+$env_var python application.py
