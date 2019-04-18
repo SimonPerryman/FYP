@@ -18,7 +18,8 @@ positives = [
     "yes",
     "sound good",
     "perfect",
-    "yeah"
+    "yeah",
+    "excellent"
 ]
 
 negatives = [

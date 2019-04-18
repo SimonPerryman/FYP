@@ -322,12 +322,16 @@ def confirm_film_response(bot, message, User):
   @param {Person} User"""
   skipFlag = False
   db_query = db.getQueryInfo(User.id, 1)
-  film_name = ''
+  film_names = set()
   if db_query:
-    film_name = db.getFilmByID(db_query['Information'])['Title']
+    for result in db_query:
+      FilmName = db.getFilmByID(result['Information'])
+      if FilmName:
+        film_names.add(FilmName['Title'])
   next_question_message = "Sorry I'm not sure I understand."
-  if film_name:
-    next_question_message = next_question_message + " Did you want a film similar to {}".format(film_name)
+  if film_names:
+    film_names = format_query_info(list(film_names))
+    next_question_message = next_question_message + " Did you want a film similar to {}".format(film_names)
   next_stage = 'ConfirmFilm'
   if check_for_expected_input(message, skip):
     skipFlag = True

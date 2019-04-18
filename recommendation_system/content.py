@@ -25,11 +25,13 @@ def sort_sim_scores(film_sim_scores):
     @returns the score"""
     return film_sim_scores[1]
 
-def content_recommender(FilmID, filmsTable):
+def content_recommender(FilmID, filmsTable, requested_film_indices):
     """Generates the top 25 most similar films to a given film.
     If less than 25 films present, returns all films, sorted in similarity order.
     @param {String} FilmID
     @param {Pandas DataFrame} filmsTable
+    @param {List} requested_film_indices - list of requested indicies (used for 
+                                           when the user requested multiple films)
     @returns {Pandas DataFrame} filmsTable (reduced to the 25th most similar films)"""
 
     cosine_sim = generate_cosine_sim(filmsTable)
@@ -37,7 +39,7 @@ def content_recommender(FilmID, filmsTable):
     filmIndex = int(filmsTable[(filmsTable['FilmID'] == FilmID)].index.values)
 
     film_sim_scores = list(enumerate(cosine_sim[filmIndex]))
-
+    film_sim_scores = [film_sim_score for film_sim_score in film_sim_scores if film_sim_score[0] not in requested_film_indices]
     film_sim_scores = sorted(film_sim_scores, key=sort_sim_scores, reverse=True)[1:]
 
     splice = 25
