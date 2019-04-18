@@ -9,7 +9,7 @@ def insertRole(RoleName):
         connection = connect()
         with connection.cursor() as cursor:
             cursor.execute(
-                """INSERT INTO `rolesList` (RoleName) VALUES (%s)""", (RoleName))
+                """INSERT INTO `roleslist` (RoleName) VALUES (%s)""", (RoleName))
 
         connection.commit()
     except Exception as e:
@@ -22,7 +22,7 @@ def getRole(RoleName):
         connection = connect()
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT * FROM `rolesList` WHERE RoleName = %s""", (RoleName))
+                """SELECT * FROM `roleslist` WHERE RoleName = %s""", (RoleName))
 
         return cursor.fetchone()
     except Exception as e:
@@ -83,7 +83,7 @@ def getKnownForTitlesTable():
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT CrewID, KnownForTitle FROM `KnownForTitles`""")
+            cursor.execute("""SELECT CrewID, KnownForTitle FROM `knownfortitles`""")
 
             return cursor.fetchall()
     except Exception as e:

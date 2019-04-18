@@ -4,7 +4,7 @@ def insertMultipleUserRatings(ratings):
   try:
     connection = connect()
     with connection.cursor() as cursor:
-        cursor.executemany("""INSERT INTO `userRatings`
+        cursor.executemany("""INSERT INTO `userratings`
                             (UserID, FilmID, Liked, Rating)
                             VALUES (%s, %s, %s, %s)""", ratings)
 
@@ -18,7 +18,7 @@ def getUserRatings(UserID):
   try:
     connection = connect()
     with connection.cursor() as cursor:
-      cursor.execute("""SELECT * FROM `userRatings` WHERE UserID = %s""", UserID)
+      cursor.execute("""SELECT * FROM `userratings` WHERE UserID = %s""", UserID)
 
       return cursor.fetchall()
   except Exception as e:
@@ -30,7 +30,7 @@ def getAllUserRatings():
   try:
     connection = connect()
     with connection.cursor() as cursor:
-      cursor.execute("""SELECT * FROM `userRatings`""")
+      cursor.execute("""SELECT * FROM `userratings`""")
 
       return cursor.fetchall()
   except Exception as e:
@@ -42,7 +42,7 @@ def getAllMlUserRatings():
   try:
     connection = connect()
     with connection.cursor() as cursor:
-      cursor.execute("""SELECT * FROM `mlUserRatings`""")
+      cursor.execute("""SELECT * FROM `mluserratings`""")
 
       return cursor.fetchall()
   except Exception as e:

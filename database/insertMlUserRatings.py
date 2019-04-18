@@ -58,7 +58,7 @@ def insert_movie_lens_ratings(movie_ratings):
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.executemany("""INSERT INTO `mlUserRatings`
+            cursor.executemany("""INSERT INTO `mluserratings`
                                 (UserID, FilmID, Liked, Rating)
                                 VALUES (%s, %s, %s, %s)""", movie_ratings)
 
