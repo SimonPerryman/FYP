@@ -30,6 +30,7 @@ class Classifier():
                                   of each word in the dataset
         @returns {Numpy Array} dataset_vector"""
         dataset = self.positive_reviews if positive else self.negative_reviews
+        # Use ngram range of 2
         cv = CountVectorizer(binary=binary, ngram_range=(1,2))
         document_vectors = cv.fit_transform(dataset).toarray()
         dataset_vector = np.zeros(document_vectors[0].size, dtype="int")
@@ -110,8 +111,8 @@ class Classifier():
 
     def classify(self, review):
         """Calculate the probability a review is positive or negative
-        @param {SpaCy Document} Review
-        @returns {String} neg if predicted as negative, pos if predicted as pos"""
+        @param {String} review
+        @returns {Tuple} neg if predicted as negative, pos if predicted as pos and the score"""
         prob_neg = 0
         prob_pos = 0
         for token in nlp(review):
@@ -121,7 +122,7 @@ class Classifier():
             if text in self.prob_neg:
                 prob_neg += log10(self.prob_neg[text]) - log10(self.sum_neg_tf_idf * (self.alpha * self.neg_alphabet_length)) + log10(self.prob_neg_review)
         score = prob_pos - prob_neg
-        return ('neg', score) if prob_neg >= prob_pos else ('pos', score)
+        return ('neg' if prob_neg >= prob_pos else 'pos', score)
 
     def test(self, testingData):
         """Tests the classifier using the testing set.
@@ -155,16 +156,32 @@ def analysis(results):
     print("False Positive", false_positive, "avg false_pos_score", false_pos_score / false_positive)
     print("False negative", false_negative, "avg false_neg_score", false_neg_score / false_negative)
 
-def sentiment_analysis(review):
+# End of source
 
-    if os.path.isfile('movie_reviews_no_digits_not_stop.pkl'):
-        reviews = load_pickle('movie_reviews_no_digits_not_stop.pkl')
+def build_film_reviews():
+    """Builds the reviews using the nltk movie reviews corpus. Preprocesses the reviews first, then
+    saves them as a pickle file before returning them.
+    @returns {List} reviews"""
+    reviews = [(preprocess_reviews_keep_stop_words(list(movie_reviews.words(fileid))), category)
+        for category in movie_reviews.categories()
+        for fileid in movie_reviews.fileids(category)]
+    save_pickle(reviews, 'movie_reviews.pkl')
+    return reviews
+
+def get_film_reviews():
+    """Gets the film reviews, building them if they are not saved as a pickle file.
+    @returns {List} reviews"""
+    if os.path.isfile('movie_reviews.pkl'):
+        return load_pickle('movie_reviews.pkl')
     else:
-        reviews = [(preprocess_reviews_keep_stop_words(list(movie_reviews.words(fileid))), category)
-                for category in movie_reviews.categories()
-                for fileid in movie_reviews.fileids(category)]
-        save_pickle(reviews, 'movie_reviews_no_digits_not_stop.pkl')
+        return build_film_reviews()
 
+def build_classifier():
+    """Creates, trains, tests and evaluates the film classifier using the
+    nltk movie reviews corpus. The reviews are shuffled in order to randomise
+    the results and improve accuracy. Classifier is saved as a pickle file.
+    @returns {Classifier} filmClassifier"""
+    reviews = get_film_reviews()
     shuffle(reviews)
     trainset = reviews[:1600]
     testset = reviews[1600:]
@@ -172,11 +189,23 @@ def sentiment_analysis(review):
     filmClassifier.train()
     results = filmClassifier.test(testset)
     analysis(results)
-    print("STOP")
     save_pickle(filmClassifier, "filmClassifier.pkl")
+    return filmClassifier
 
-    return True
+def get_classifier():
+    """Gets the film classifier - loading it from memory if
+    stored as a pickle file, else creating one if not stored.
+    @returns {Classifier} Film Classifier"""
+    if os.path.isfile('filmClassifier.pkl'):
+        return load_pickle('filmClassifier.pkl')
+    else:
+        return build_classifier()
 
+def perform_sentiment_analysis(review):
+    """Performs sentiment analysis on a user's review,
+    classifying it as a positive or negative review"""
+    filmClassifier = get_classifier()
+    return filmClassifier.classify(review)
 
 if __name__ == "__main__":
     print(sentiment_analysis("review"))

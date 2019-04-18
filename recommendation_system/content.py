@@ -9,6 +9,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 # (Rounak Banik 2018)" as base frame
 
 def generate_cosine_sim(filmsTable=None):
+    """Generates a cosine similarity matrix using the count vectorizer.
+    @param {Pandas DataFrame} filmsTable
+    @returns {Object} cosine_similarity - cosine similarity matrix"""
     if filmsTable is None:
         filmsTable = getFilmTable()
 
@@ -17,9 +20,17 @@ def generate_cosine_sim(filmsTable=None):
     return cosine_similarity(cv_matrix, cv_matrix)
 
 def sort_sim_scores(film_sim_scores):
+    """Sorts the film score based on its score.
+    @param {Pandas Series} film_sim_scores
+    @returns the score"""
     return film_sim_scores[1]
 
 def content_recommender(FilmID, filmsTable):
+    """Generates the top 25 most similar films to a given film.
+    If less than 25 films present, returns all films, sorted in similarity order.
+    @param {String} FilmID
+    @param {Pandas DataFrame} filmsTable
+    @returns {Pandas DataFrame} filmsTable (reduced to the 25th most similar films)"""
 
     cosine_sim = generate_cosine_sim(filmsTable)
 
