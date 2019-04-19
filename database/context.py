@@ -27,14 +27,15 @@ stages = {
         "AskCrew": 7,
         "SuggestedFilm": 8
     },
+    "ChitChat": 1,
     "filmReview": {
         "Error": 0,
         "AskIfWatched": 1,
         "AskReview": 2,
         "GiveReview": 3,
-        "ConfirmNoReview": 4
+        "ConfirmNoReview": 4,
+        "ScoreFilm": 5
     },
-    "ChitChat": 1,
     "Error": 0
 }
 
@@ -42,7 +43,9 @@ stages = {
 def getStage(context):
     return {
         1: "registrationStages",
-        2: "filmSuggestion"
+        2: "filmSuggestion",
+        3: "ChitChat",
+        4: "FilmReview"
     }.get(context, '')
 
 

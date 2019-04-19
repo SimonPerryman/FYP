@@ -2,6 +2,7 @@ from time import time
 from .chitchat import *
 from .registration import registrationHandler
 from .film_suggestion import FilmSuggestionHandler
+from .film_review import filmReviewHandler
 from database import contexts
 import database as db
 import spacy
@@ -31,9 +32,10 @@ def conversation_handler(bot, update):
             self.context = userDetails.get('Context', 0)
             self.stage = userDetails.get('Stage', 0)
             self.last_message = userDetails.get('LastMessage', 0)
+            self.suggested_film = userDetails.get('SuggestedFilm', 0)
             self.suggested_film_index = userDetails.get('SuggestedFilmIndex', 0)
-            self.previousContext = userDetails.get('previousContext', 0)
-            self.previousStage = userDetails.get('previousStage', 0)
+            self.previous_context = userDetails.get('previousContext', 0)
+            self.previous_stage = userDetails.get('previousStage', 0)
             favouriteGenres =  getFavouriteGenres(userDetails['UserID'])
             for genre in favouriteGenres:
                 if genre.get('Order', 0) == 1:
@@ -48,7 +50,7 @@ def conversation_handler(bot, update):
     if User.context == contexts['InitialUserRegistration']:
         registrationHandler(bot, update, User)
     elif User.context == contexts['FilmReview']:
-        film_review_handler(bot, update, User)
+        filmReviewHandler(bot, update, User)
     elif User.context == contexts['FilmSuggestion'] or intent == 1:
         FilmSuggestionHandler(bot, update, User)
         

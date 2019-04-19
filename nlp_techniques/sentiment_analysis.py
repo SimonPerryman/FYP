@@ -208,4 +208,4 @@ def perform_sentiment_analysis(review):
     return filmClassifier.classify(review)
 
 if __name__ == "__main__":
-    print(sentiment_analysis("review"))
+    print(perform_sentiment_analysis("review"))

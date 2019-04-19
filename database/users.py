@@ -148,3 +148,17 @@ def setAskFilmReview(Users):
         print("Error updating users context to film review: ", str(e))
     finally:
         connection.close()
+
+def removeSuggestedFilm(UserID):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE `users` SET SuggestedFilm = %s, SuggestedFilmStatus = %s,
+                            SuggestedFilmIndex = %s, SuggestedFilmTime = %s, Asked = %s
+                            WHERE UserID = %s""", (None, 0, 0, 0, 0, UserID))
+
+        connection.commit()
+    except Exception as e:
+        print("Error updating users context to film review: ", str(e))
+    finally:
+        connection.close()
