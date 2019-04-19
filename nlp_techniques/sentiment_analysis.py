@@ -171,9 +171,11 @@ def build_film_reviews():
 def get_film_reviews():
     """Gets the film reviews, building them if they are not saved as a pickle file.
     @returns {List} reviews"""
-    if os.path.isfile('movie_reviews.pkl'):
+    if os.path.isfile("{}\{}".format(os.environ['PICKLE_DIRECTORY'], 'movie_reviews.pkl')):
+        print("Movie Reviews found, using pickle file.")
         return load_pickle('movie_reviews.pkl')
     else:
+        print("Building movie reviews.")
         return build_film_reviews()
 
 def build_classifier():
@@ -196,9 +198,11 @@ def get_classifier():
     """Gets the film classifier - loading it from memory if
     stored as a pickle file, else creating one if not stored.
     @returns {Classifier} Film Classifier"""
-    if os.path.isfile('filmClassifier.pkl'):
+    if os.path.isfile("{}\{}".format(os.environ['PICKLE_DIRECTORY'], 'filmClassifier.pkl')):
+        print("Classifier found, using pickle file")
         return load_pickle('filmClassifier.pkl')
     else:
+        print("Classifier not found, creating classifier")
         return build_classifier()
 
 def perform_sentiment_analysis(review):

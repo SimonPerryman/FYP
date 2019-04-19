@@ -34,8 +34,8 @@ def conversation_handler(bot, update):
             self.last_message = userDetails.get('LastMessage', 0)
             self.suggested_film = userDetails.get('SuggestedFilm', 0)
             self.suggested_film_index = userDetails.get('SuggestedFilmIndex', 0)
-            self.previous_context = userDetails.get('previousContext', 0)
-            self.previous_stage = userDetails.get('previousStage', 0)
+            self.previous_context = userDetails.get('PreviousContext', 0)
+            self.previous_stage = userDetails.get('PreviousStage', 0)
             favouriteGenres =  getFavouriteGenres(userDetails['UserID'])
             for genre in favouriteGenres:
                 if genre.get('Order', 0) == 1:

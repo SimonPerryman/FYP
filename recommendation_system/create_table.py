@@ -7,7 +7,7 @@ import database as db
 def check_film_table_exists():
     """Checks if the file exists in the system
     @returns {Boolean} True if found, False if not."""
-    return os.path.isfile('filmsTable.pkl')
+    return os.path.isfile("{}\{}".format(os.environ['PICKLE_DIRECTORY'], 'filmsTable.pkl'))
 
 def sanitise_genres(genres):
     """Returns a list of genres, removing any null (None) values.
