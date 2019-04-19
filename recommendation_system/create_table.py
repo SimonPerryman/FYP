@@ -115,7 +115,7 @@ def create_film_table():
     print("Created metadata data")
 
     print("Saving filmsTable as pickle file")
-    filmsTable.to_pickle('filmsTable.pkl')
+    filmsTable.to_pickle("{}\{}".format(os.environ['PICKLE_DIRECTORY'],'filmsTable.pkl'))
     return filmsTable
 
 def getFilmTable():

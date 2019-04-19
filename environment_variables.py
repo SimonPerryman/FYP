@@ -8,4 +8,6 @@ def add_environment_variables():
     os.environ['LOGGING_FORMAT'] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     os.environ['LOGGING_LEVEL'] = "20"
 
-    os.environ['APPLICATION_PATH'] = os.path.dirname(os.path.realpath(__file__))
+    application_path = os.path.dirname(os.path.realpath(__file__))
+    os.environ['APPLICATION_PATH'] = application_path
+    os.environ['PICKLE_DIRECTORY'] = "{}\{}".format(application_path, "pickle_files")

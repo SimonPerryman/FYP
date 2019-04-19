@@ -1,7 +1,9 @@
 import os
+from environment_variables import add_environment_variables
+from misc import save_pickle, load_pickle
 def test():
-  print("hello", os.path.dirname(os.path.realpath(__file__)))
-  
+  add_environment_variables()
+  print(os.environ['PICKLE_DIRECTORY'])
   return True
 
 if __name__ == '__main__':
