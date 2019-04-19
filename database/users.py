@@ -162,3 +162,15 @@ def removeSuggestedFilm(UserID):
         print("Error updating users context to film review: ", str(e))
     finally:
         connection.close()
+
+def getAllUsers():
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM `users`""")
+
+        return cursor.fetchall()
+    except Exception as e:
+        print("Error getting user all users", str(e))
+    finally:
+        connection.close()

@@ -11,3 +11,5 @@ def add_environment_variables():
     application_path = os.path.dirname(os.path.realpath(__file__))
     os.environ['APPLICATION_PATH'] = application_path
     os.environ['PICKLE_DIRECTORY'] = "{}\{}".format(application_path, "pickle_files")
+
+    os.environ['BOT_HAPPINESS'] = "3"

@@ -32,6 +32,7 @@ def main():
     # Job Queue
     job_queue = updater.job_queue
     job_queue.run_daily(conversations.ask_for_film_review, datetime.time(9, 0))
+    job_queue.run_daily(botAssets.calculate_mood, datetime.time(0, 1))
 
     # Commands
     dispatcher.add_handler(start_handler)

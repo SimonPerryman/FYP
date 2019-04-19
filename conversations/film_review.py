@@ -1,10 +1,11 @@
 import sys
 import os
 from time import time
+import telegram
 sys.path.insert(0, os.environ['APPLICATION_PATH'])
 import database as db
 from database import setUserContextAndStage, contexts, stages
-from botAssets import positives, negatives, skip
+from botAssets import positives, negatives, skip, scoreKeyboard
 from nlp_techniques import check_for_expected_input, perform_sentiment_analysis
 
 def check_for_users_with_suggested_films():
@@ -92,7 +93,8 @@ def GiveReviewResponse(bot, message, User):
     sentiment = perform_sentiment_analysis(message)
     db.insertReview(User.id, User.suggested_film, message, 1 if sentiment[0] == "pos" else 0, sentiment[1])
     bot.send_message(User.id, "Thanks for leaving your review! I have noted it down.")
-    bot.send_message(User.id, "Could you also score the film out of 5? 1 being poor and 5 being excellent.")
+    bot.send_message(User.id, "Could you also score the film out of 5? 1 being poor and 5 being excellent.",
+                    reply_markup=telegram.ReplyKeyboardMarkup(scoreKeyboard))
     setUserContextAndStage(User.id, contexts['FilmReview'], stages['filmReview'][next_stage])
 
 def ConfirmNoReviewResponse(bot, message, User):
@@ -133,9 +135,10 @@ def ScoreFilmResponse(bot, message, User):
         next_stage = User.previous_stage
         next_context = User.previous_context
         next_message = "Excellent! Thank you for rating the film."
+        bot.send_message(User.id, next_message, reply_markup=telegram.ReplyKeyboardRemove())
     except Exception as e:
         print("Error rounding user rating", str(e))
-    bot.send_message(User.id, next_message)
+        bot.send_message(User.id, next_message)
     setUserContextAndStage(User.id, next_context, next_stage)
 
 
