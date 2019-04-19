@@ -4,7 +4,8 @@ contexts = {
     "Error": 0,
     "InitialUserRegistration": 1,
     "FilmSuggestion": 2,
-    "ChitChat": 3
+    "ChitChat": 3,
+    "FilmReview": 4
 }
 
 stages = {
@@ -24,7 +25,14 @@ stages = {
         "AskGenre": 5,
         "ConfirmCrew": 6,
         "AskCrew": 7,
-        "SuggestedFilm": 8 
+        "SuggestedFilm": 8
+    },
+    "filmReview": {
+        "Error": 0,
+        "AskIfWatched": 1,
+        "AskReview": 2,
+        "GiveReview": 3,
+        "ConfirmNoReview": 4
     },
     "ChitChat": 1,
     "Error": 0

@@ -32,6 +32,8 @@ def conversation_handler(bot, update):
             self.stage = userDetails.get('Stage', 0)
             self.last_message = userDetails.get('LastMessage', 0)
             self.suggested_film_index = userDetails.get('SuggestedFilmIndex', 0)
+            self.previousContext = userDetails.get('previousContext', 0)
+            self.previousStage = userDetails.get('previousStage', 0)
             favouriteGenres =  getFavouriteGenres(userDetails['UserID'])
             for genre in favouriteGenres:
                 if genre.get('Order', 0) == 1:
@@ -45,8 +47,11 @@ def conversation_handler(bot, update):
     db.setLastMessage(User.id, int(time()))
     if User.context == contexts['InitialUserRegistration']:
         registrationHandler(bot, update, User)
+    elif User.context == contexts['FilmReview']:
+        film_review_handler(bot, update, User)
     elif User.context == contexts['FilmSuggestion'] or intent == 1:
         FilmSuggestionHandler(bot, update, User)
+        
   
 
 def echo(bot, update):

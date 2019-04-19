@@ -29,6 +29,11 @@ def main():
     updater = Updater(token=os.environ['BOT_TOKEN'])
     dispatcher = updater.dispatcher
 
+    # Job Queue
+    job_queue = updater.job_queue
+    job_queue.run_repeating(conversations.ask_for_film_review, interval=10)
+    # job_queue.run_daily(conversations.ask_for_film_review, )
+
     # Commands
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(update_genre_handler)
