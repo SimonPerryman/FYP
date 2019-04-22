@@ -1,5 +1,5 @@
-from db_connection import connect
-from shared import preprocess_string
+from .db_connection import connect
+from nlp_techniques import preprocess_string
 
 namebasics = r'D:\dev\Dataset\name.basics.tsv\data.tsv'
 

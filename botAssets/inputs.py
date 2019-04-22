@@ -18,7 +18,8 @@ positives = [
     "yes",
     "sound good",
     "perfect",
-    "yeah"
+    "yeah",
+    "excellent"
 ]
 
 negatives = [
@@ -39,4 +40,12 @@ skip = [
     "skip",
     "i want to skip this",
     "i do not care"
+]
+
+feeling = [
+    "how be -PRON-",
+    "be -PRON- alright",
+    "alright",
+    "how -PRON- do",
+    "-PRON- ok"
 ]

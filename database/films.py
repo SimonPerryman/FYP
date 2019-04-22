@@ -1,4 +1,4 @@
-from db_connection import connect
+from .db_connection import connect
 
 def getFilmByID(FilmID):
     try:
@@ -17,7 +17,7 @@ def getFilmByProcessedName(Name):
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT FilmID, Title from `films` WHERE TitlePP = %s""", (Name))
+            cursor.execute("""SELECT FilmID, Title FROM `films` WHERE TitlePP = %s""", (Name))
 
             return cursor.fetchone()
     except Exception as e:
@@ -29,7 +29,7 @@ def getFilmBySimilarName(Name):
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT FilmID, Title from `films` WHERE TitlePP LIKE %s""", ('%{}%'.format(Name)))
+            cursor.execute("""SELECT FilmID, Title FROM `films` WHERE TitlePP LIKE %s""", ('%{}%'.format(Name)))
 
             return cursor.fetchone()
     except Exception as e:

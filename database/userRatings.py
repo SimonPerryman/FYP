@@ -1,24 +1,37 @@
-from db_connection import connect
+from .db_connection import connect
 
 def insertMultipleUserRatings(ratings):
   try:
     connection = connect()
     with connection.cursor() as cursor:
-        cursor.executemany("""INSERT INTO `userRatings`
+        cursor.executemany("""INSERT INTO `userratings`
                             (UserID, FilmID, Liked, Rating)
                             VALUES (%s, %s, %s, %s)""", ratings)
 
     connection.commit()
   except Exception as e:
-    print("Error inserting user data", str(e))
+    print("Error inserting multiple users data", str(e))
   finally:
     connection.close()
+
+def insertUserRating(UserId, FilmID, Liked, Rating):
+  try:
+    connection = connect()
+    with connection.cursor() as cursor:
+        cursor.execute("""INSERT INTO `userratings`
+                        (UserID, FilmID, Liked, Rating)
+                        VALUES (%s, %s, %s, %s)""",
+                        (UserId, FilmID, Liked, Rating))
+  except Exception as e:
+    print("Error inserting user rating", str(e))
+  finally:
+      connection.close()
 
 def getUserRatings(UserID):
   try:
     connection = connect()
     with connection.cursor() as cursor:
-      cursor.execute("""SELECT * FROM `userRatings` WHERE UserID = %s""", UserID)
+      cursor.execute("""SELECT * FROM `userratings` WHERE UserID = %s""", UserID)
 
       return cursor.fetchall()
   except Exception as e:
@@ -30,7 +43,7 @@ def getAllUserRatings():
   try:
     connection = connect()
     with connection.cursor() as cursor:
-      cursor.execute("""SELECT * FROM `userRatings`""")
+      cursor.execute("""SELECT * FROM `userratings`""")
 
       return cursor.fetchall()
   except Exception as e:
@@ -42,7 +55,7 @@ def getAllMlUserRatings():
   try:
     connection = connect()
     with connection.cursor() as cursor:
-      cursor.execute("""SELECT * FROM `mlUserRatings`""")
+      cursor.execute("""SELECT * FROM `mluserratings`""")
 
       return cursor.fetchall()
   except Exception as e:

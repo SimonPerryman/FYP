@@ -4,12 +4,10 @@ import database as db
 import pandas as pd
 from database import setUserContextAndStage, contexts, stages
 from recommendation_system import hybrid_recommender
-from nlp_techniques import lemmatize_sentence
-# import sys
-# sys.path.insert(0, 'C:/dev/projects/University/FYP/')
+from nlp_techniques import lemmatize_sentence, check_for_expected_input
 from misc import get_imdb_film_details
 from botAssets import positives, negatives, negative_film_responses, skip
-nlp = spacy.load('en_core_web_lg')
+nlp = spacy.load('en_core_web_sm')
 
 def generate_film(bot, User, index):
   """Generates a suggested film for the user using the query information
@@ -34,39 +32,6 @@ def generate_film(bot, User, index):
     bot.send_message(User.id, "I am currently struggling to suggest a similar film for you, please ask me again later.")
     setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])
     print("Error suggesting a film", str(e))
-
-def check_for_expected_input(message, expected_inputs):
-  """Checks whether a message an the expected input by checking ngrams
-  of both the message and the expected inputs
-  @param {String} message
-  @param {List} expected_inputs
-  @returns True if message is of expected inputs, else False."""
-  lemmatized_message = lemmatize_sentence(message)
-  doc = nlp(u"{}".format(lemmatized_message))
-  for expected_input in expected_inputs:
-    expected_input = nlp(u"{}".format(expected_input))
-    input_length = len(expected_input)
-    doc_length = len(doc)
-    if doc_length == input_length:
-      if lemmatized_message == expected_input.text:
-        return True
-    elif doc_length > input_length: 
-      i = 0
-      j = input_length
-      while j <= doc_length:
-        if doc[i:j].text == expected_input.text:
-          return True
-        i += 1
-        j += 1
-    else:
-      i = 0
-      j = doc_length
-      while j <= input_length:
-        if expected_input[i:j].text == doc.text:
-          return True
-        i += 1
-        j += 1
-  return False
 
 def preprocess_text(film_name):
   """Preprocess the film name and returns it
@@ -296,8 +261,8 @@ def extract_crew(UserID, message):
   
 
 def extract_data(bot, message, User):
-  """Calls the functions to search for the genre, film and crew information
-  and inserts the relevant information into the database.
+  """Stage 1 Response. Calls the functions to search for the genre, film and
+  crew information and inserts the relevant information into the database.
   @param {Bot} bot
   @param {String} message
   @param {Person} User"""
@@ -324,12 +289,16 @@ def confirm_film_response(bot, message, User):
   @param {Person} User"""
   skipFlag = False
   db_query = db.getQueryInfo(User.id, 1)
-  film_name = ''
+  film_names = set()
   if db_query:
-    film_name = db.getFilmByID(db_query['Information'])['Title']
+    for result in db_query:
+      FilmName = db.getFilmByID(result['Information'])
+      if FilmName:
+        film_names.add(FilmName['Title'])
   next_question_message = "Sorry I'm not sure I understand."
-  if film_name:
-    next_question_message = next_question_message + " Did you want a film similar to {}".format(film_name)
+  if film_names:
+    film_names = format_query_info(list(film_names))
+    next_question_message = next_question_message + " Did you want a film similar to {}".format(film_names)
   next_stage = 'ConfirmFilm'
   if check_for_expected_input(message, skip):
     skipFlag = True
@@ -493,12 +462,14 @@ def confirm_crew_response(bot, message, User):
     db.removeQueryInfo(User.id, 3)
   else:
     db_query = db.getQueryInfo(User.id, 3)
-    crew_name = ''
+    crew_names = []
     if db_query:
-      crew_name = db.getCrewByID(db_query['Information'])['Name']
+      for result in db_query:
+        crew_names.append(db.getCrewByID(result['Information'])['Name'])
+      crew_names = format_query_info(crew_names)
     next_question_message = "Sorry I don't understand."
-    if crew_name:
-      next_question_message = next_question_message + " Did you want a film similar to {}".format(crew_name)
+    if crew_names:
+      next_question_message = next_question_message + " Did you want a film with {}?".format(crew_names)
     bot.send_message(User.id, next_question_message)
 
 def ask_crew_response(bot, message, User):
@@ -544,6 +515,7 @@ def confirm_suggested_film_response(bot, message, User):
   negative_film_responses.extend(negatives)
   if check_for_expected_input(message, positives):
     db.updateSuggestedFilmStatus(User.id, 1)
+    db.updateSuggestedFilmIndex(User.id, 0)
     db.removeQueryInfo(User.id)
     bot.send_message(User.id, "Ok, have fun watching the film! Let me know what you thought of it!")
     setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])

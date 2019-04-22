@@ -12,3 +12,6 @@ def genresKeyboard():
     custom_keyboard.append(["Skip this for now!"])
 
     return custom_keyboard
+
+def scoreKeyboard():
+    return [1, 2, 3, 4, 5]
