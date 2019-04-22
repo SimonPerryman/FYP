@@ -6,7 +6,7 @@ from database import setUserContextAndStage, contexts, stages
 from recommendation_system import hybrid_recommender
 from nlp_techniques import lemmatize_sentence, check_for_expected_input
 from misc import get_imdb_film_details
-from botAssets import positives, negatives, negative_film_responses, skip
+from botAssets import positives, negatives, negative_film_responses, skip, cancel
 nlp = spacy.load('en_core_web_sm')
 
 def generate_film(bot, User, index):
@@ -527,6 +527,17 @@ def confirm_suggested_film_response(bot, message, User):
   else:
     bot.send_message(User.id, "Sorry I don't understand, is this film fine?")
 
+def cancel_film_suggestion(bot, User):
+  """Gets the user out of the film suggestion conversation
+  @param {Bot} bot
+  @param {Person} User"""
+  db.updateSuggestedFilmStatus(User.id, 1)
+  db.updateSuggestedFilmIndex(User.id, 0)
+  db.removeQueryInfo(User.id)
+  setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])
+  bot.send_message(User.id, "Ok, that's fine. Just let me know if you do want me to suggest a film for you later.")
+
+
 def FilmSuggestionHandler(bot, update, User):
   """Handler function to call the relevant function depending on
   what stage the user is on in the film suggestion journey.
@@ -534,7 +545,9 @@ def FilmSuggestionHandler(bot, update, User):
   @param {String} message
   @param {Person} User"""
   message = update.message.text
-  if User.stage == 1:
+  if check_for_expected_input(message, cancel):
+    cancel_film_suggestion(bot, User)
+  elif User.stage == 1:
     extract_data(bot, message, User)
   elif User.stage == 2:
     confirm_film_response(bot, message, User)

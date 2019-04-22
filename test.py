@@ -1,10 +1,16 @@
 import os
-from environment_variables import add_environment_variables
-from misc import save_pickle, load_pickle
-import nltk.tokenize
+os.environ['APPLICATION_PATH'] = r"C:/dev/projects/university/FYP/"
+from nlp_techniques import lemmatize_sentence
 def test():
-  add_environment_variables()
-  print(os.environ['PICKLE_DIRECTORY'])
+  messages = [
+    "I want to cancel",
+    "I don't want to do this anymore",
+    "stop",
+    "exit",
+    "leave"
+  ]
+  for m in messages:
+    print(lemmatize_sentence(m))
   return True
 
 if __name__ == '__main__':

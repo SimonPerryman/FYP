@@ -21,13 +21,13 @@ def start(bot, update):
                     reply_markup=reply_markup)
 
 def askSecondFavouriteGenre(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="Awesome. What's your next favourite genre?! Mine's Superhero films :)")
+    bot.send_message(chat_id=update.message.chat_id, text="Awesome. What's your second favourite genre?! Mine's Superhero films :)")
 
 def askThirdFavouriteGenre(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Sweet. What's your third favourite genre?! If I had to guess I'd say you like horror films!")
 
-def askAge(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="Nice. I like also like <X>! I guess I just love all types of films!")
+def askAge(bot, update, User):
+    bot.send_message(chat_id=update.message.chat_id, text="Nice. I like also like {}! I guess I just love all types of films!".format(User.thirdFavouriteGenre))
     bot.send_message(chat_id=update.message.chat_id, text="It's my birthday tomorrow. I'm going to be 22. How old are you?",
                     reply_markup=telegram.ReplyKeyboardRemove())
 
@@ -44,8 +44,8 @@ def registrationComplete(bot, update):
     # TODO Custom Keyboard maybe    
 
 def skipResponse(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="""Sorry, I thought I was being a bit too <X> myself. If you want to tell me your
-                                                            favourite genres later just let me know, but for now I'll just try to figure it out myself haha""",
+    bot.send_message(chat_id=update.message.chat_id, text="""Sorry, I thought I was being a bit too invasive myself. If you want to tell me your
+                                                            favourite genres olr age later just let me know, but for now I'll just try to figure it out myself haha""",
                     reply_markup=telegram.ReplyKeyboardRemove())
 
 def registrationHandler(bot, update, User):
@@ -77,7 +77,7 @@ def registrationHandler(bot, update, User):
             elif User.stage == stages['registrationStages']['ThirdGenre']:
                 insertFavouriteGenres(User.id, 0, 0, genreID)
                 setUserContextAndStage(User.id, User.context, stages['registrationStages']['Age'])
-                askAge(bot, update)
+                askAge(bot, update, User)
         elif User.stage == stages['registrationStages']['Age']:
             if message.isdigit() and int(message) in range(4,100):
                 updateUserAge(User.id, int(message))
