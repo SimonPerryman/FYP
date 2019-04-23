@@ -1,46 +1,41 @@
-from pymongo import MongoClient
-import random
+from .db_connection import connect
 
-client = MongoClient()
+def getUserLatestConversationID(UserID):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT ConversationID FROM `conversations` WHERE UserID = %s""", UserID)
+            results = cursor.fetchall()
+            return results[len(results) - 1].get('ConversationID')
+    except Exception as e:
+        print("Error getting latest conversation ID for a user", str(e))
+    finally:
+        connection.close()
 
-# db = client[config.get("Mongo_db", "db_name")]
-# conversations_collection = db[config.get("Mongo_db", "conversations_collection")]
-db = client['testing']
-conversations_collection = db['conversations']
+def insertNewConversation(UserID):
+    try:
+        connection = connect()
+        with connection.cursor() as cursor:
+            cursor.execute("""INSERT INTO `conversations` (UserID) VALUES (%s)""", UserID)
+        connection.commit()
+    except Exception as e:
+        print("Error inserting new conversation", str(e))
+    finally:
+        connection.close()
 
-def addToConversation(UserID, ConversationID, MessageID, Text, Timestamp):
-    return conversations_collection.update({
-        "UserID": UserID,
-        "Conversation.ConversationID": ConversationID
-    }, {
-        "$push": {
-            "Conversations.$.Conversation": {
-                "MessageID": MessageID,
-                "Message": Text,
-                "Timestamp": Timestamp
-            }
-        }
-    })
+def insertMessage(UserID, Message, Timestamp, Intent, Context, Stage, NewConversation):
+    try:
+        connection = connect()
+        if NewConversation == 1:
+            insertNewConversation(UserID)
+        ConversationID = getUserLatestConversationID(UserID)
 
-def newConversation(UserID, Conversation):
-    return conversations_collection.update({
-        "UserID": UserID
-    }, {
-        "$push": {
-            "ConversationID": random.randint(0, 99999999),
-            "Conversation": Conversation
-        }
-    })
-
-def getUserConversations(UserID):
-    return conversations_collection.find_one({
-        "UserID": UserID
-    }, projection={"Conversations": 1})
-
-def getSpecificUserConversation(UserID, ConversationID):
-    return conversations_collection.find_one({
-        "UserID": UserID,
-        "Conversations.ConversationID": ConversationID
-    }, {
-        "Conversations.$.Conversation": 1
-    })
+        with connection.cursor() as cursor:
+            cursor.execute("""INSERT INTO `messages` (ConversationID, Timestamp, Intent, Context, Stage)
+            VALUES (%s, %s, %s, %s, %s)""", (ConversationID, Timestamp, Intent, Context, Stage))
+            
+        connection.commit()
+    except Exception as e:
+        print("Error inserting message: ", str(e))
+    finally:
+        connection.close()

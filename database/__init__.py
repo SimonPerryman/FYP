@@ -1,6 +1,5 @@
 from .users import *
-from .conversations import (addToConversation, newConversation, getUserConversations,
-                            getSpecificUserConversation)
+from .conversations import (insertMessage, getUserLatestConversationID)
 from .genres import *
 from .films import (getFilmByID, getFilmBySimilarName, getAllFilms, getFilmByProcessedName,
                     getAllNonOriginalAlternativeFilmTitles)

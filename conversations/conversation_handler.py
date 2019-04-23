@@ -12,7 +12,20 @@ nlp = spacy.load('en_core_web_lg')
 
 from database import getUser, getFavouriteGenres
 
+def calculate_if_new_conversation(User, intent, currentTime):
+    """Estimates if the message is the start is the start of a new conversation
+    @param {Person} User
+    @param {Int} intent - estimated intent of message
+    @param {Int} currentTime
+    @returns 1 if new conversation, else 0"""
+    if (User.last_message < currentTime - 172800) or intent == 1:
+        return 1
+    return 0
+
 def identify_intent(message):
+    """Identify the intent of the given message
+    @param {String} message
+    @returns {Int} intent"""
     doc = nlp(message.lower())
     filmSuggestionSimilarity = nlp(u'can you suggest a film for me to watch').similarity(doc)
     howAreYouSimilarity = nlp(u"how are you feeling today").similarity(doc)
@@ -27,8 +40,14 @@ def identify_intent(message):
     return intent
 
 def conversation_handler(bot, update):
+    """Handler function to call the correct function depending on the estimated intent
+    of the message.
+    @param {Bot} bot
+    @param {update} update"""
+    currentTime = int(time())
+    message = update.message.text
+    intent = identify_intent(message)
     userDetails = getUser(update.message.chat.id)
-    intent = identify_intent(update.message.text)
     class Person:
         def __init__(self):
             self.id = userDetails['UserID']
@@ -52,7 +71,9 @@ def conversation_handler(bot, update):
                     self.thirdFavouriteGenre = genre.get('Name', 0)
                     
     User = Person()
-    db.setLastMessage(User.id, int(time()))
+    db.setLastMessage(User.id, currentTime)
+    NewConversation = calculate_if_new_conversation(User, intent, currentTime)
+    db.insertMessage(User.id, message, currentTime, intent, User.context, User.stage, NewConversation)
     if User.context == contexts['InitialUserRegistration']:
         registrationHandler(bot, update, User)
     elif User.context == contexts['FilmReview']:

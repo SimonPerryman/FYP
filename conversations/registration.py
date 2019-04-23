@@ -3,16 +3,12 @@ import botAssets
 from time import time
 import random
 from database import (getAllGenres, insertFavouriteGenres, setUserContextAndStage, updateUserAge,
-                     insertUser, newConversation, stages, contexts)
+                     insertUser, insertMessage, stages, contexts)
 from .errors import errorMessage
 
 def start(bot, update):
     insertUser(update.message.chat.id, update.message.chat.first_name, update.message.chat.last_name)
-    newConversation(update.message.chat.id, {
-        "MessageID": random.randint(0, 99999999),
-        "Message": update.message.text,
-        "Timestamp": int(time())
-    })
+    insertMessage(update.message.chat.id, update.message.text, time(), 0, contexts['InitialUserRegistration'], None, 1)
     genres_keyboard = botAssets.genresKeyboard()
     reply_markup = telegram.ReplyKeyboardMarkup(genres_keyboard)
     bot.send_message(chat_id=update.message.chat_id,
