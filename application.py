@@ -12,7 +12,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import telegram
 
 # Program Files
-from database import insertUser, newConversation
+from database import insertUser
 import conversations
 import botAssets
 import commands

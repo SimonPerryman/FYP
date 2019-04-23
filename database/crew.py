@@ -13,7 +13,7 @@ def insertRole(RoleName):
 
         connection.commit()
     except Exception as e:
-        print("Error updating user age: ", str(e))
+        print("Error inserting role: ", str(e))
     finally:
         connection.close()
 
@@ -26,7 +26,7 @@ def getRole(RoleName):
 
         return cursor.fetchone()
     except Exception as e:
-        print("Error updating user age: ", str(e))
+        print("Error getting role: ", str(e))
     finally:
         connection.close()
 
@@ -50,7 +50,7 @@ def getCrewByProcessedName(Name):
 
             return cursor.fetchone()
     except Exception as e:
-        print("Error getting crew id by similar name, with name {}".format(Name), str(e))
+        print("Error getting crew id by processed name, with name {}".format(Name), str(e))
     finally:
         connection.close()
 
@@ -74,7 +74,7 @@ def getCrewByID(CrewID):
 
             return cursor.fetchone()
     except Exception as e:
-        print("Error getting crew id by similar name, with ID {}".format(CrewID), str(e))
+        print("Error getting crew info by id, with ID {}".format(CrewID), str(e))
     finally:
         connection.close()
         
