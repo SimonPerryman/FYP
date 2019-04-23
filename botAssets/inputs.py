@@ -49,3 +49,11 @@ feeling = [
     "how -PRON- do",
     "-PRON- ok"
 ]
+
+cancel = [
+    "i want to cancel",
+    "i do not want to do this anymore",
+    "stop",
+    "exit",
+    "leave"
+]

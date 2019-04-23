@@ -21,9 +21,7 @@ logging.basicConfig(format=os.environ['LOGGING_FORMAT'], level=int(os.environ['L
                     
 start_handler = CommandHandler('start', conversations.start)
 update_genre_handler = CommandHandler('ufg', commands.updateGenre, pass_args=True)
-greetings_handler = MessageHandler(botAssets.GreetingFilter(), conversations.greetings)
 conversation_handler = MessageHandler(Filters.text, conversations.conversation_handler)
-echo_handler = MessageHandler(Filters.text, conversations.echo)
 
 def main():
     updater = Updater(token=os.environ['BOT_TOKEN'])
@@ -38,12 +36,8 @@ def main():
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(update_genre_handler)
     
-    # Strict Messages
-    dispatcher.add_handler(greetings_handler)
-
     # Conversation Handler
     dispatcher.add_handler(conversation_handler)
-    dispatcher.add_handler(echo_handler)
     updater.start_polling()
     # updater.idle()
     print("Started Bot")
