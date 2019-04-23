@@ -537,7 +537,6 @@ def cancel_film_suggestion(bot, User):
   setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])
   bot.send_message(User.id, "Ok, that's fine. Just let me know if you do want me to suggest a film for you later.")
 
-
 def FilmSuggestionHandler(bot, update, User):
   """Handler function to call the relevant function depending on
   what stage the user is on in the film suggestion journey.
