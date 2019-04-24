@@ -158,7 +158,7 @@ def check_for_crew(message):
       crew_present = True
     
     if token.text == "by":
-      for anc in token.anc:
+      for anc in token.ancestors:
         if anc.text == "directed" or anc.text == "written":
           message = message[token.idx:].title()
           crew_present = True
