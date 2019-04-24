@@ -5,15 +5,20 @@ import random
 from database import (getAllGenres, insertFavouriteGenres, setUserContextAndStage, updateUserAge,
                      insertUser, insertMessage, stages, contexts)
 from .errors import errorMessage
+from nlp_techniques import check_for_expected_input
 
 def start(bot, update):
+    """Conversation logic for when the user first starts talking to the bot, called when the user uses the "/start"
+    command.
+    @param {Bot} bot
+    @param {update} update"""
     insertUser(update.message.chat.id, update.message.chat.first_name, update.message.chat.last_name)
     insertMessage(update.message.chat.id, update.message.text, time(), 0, contexts['InitialUserRegistration'], None, 1)
     genres_keyboard = botAssets.genresKeyboard()
     reply_markup = telegram.ReplyKeyboardMarkup(genres_keyboard)
-    bot.send_message(chat_id=update.message.chat_id,
-                    text="""Hey {}! Thanks for talking to me, I haven't spoken to anyone in a while! I'm really interested in films.
-                    My favourite genre is comedy, what's yours?""".format(update.message.chat.first_name), 
+    bot.send_message(chat_id=update.message.chat_id, 
+                     text="Hey {}! Thanks for talking to me, I haven't spoken to anyone in a while!".format(update.message.chat.first_name))
+    bot.send_message(chat_id=update.message.chat_id, text="""I'm really interested in films. My favourite genre is comedy, what's yours?""", 
                     reply_markup=reply_markup)
 
 def askSecondFavouriteGenre(bot, update):
@@ -47,7 +52,7 @@ def skipResponse(bot, update):
 def registrationHandler(bot, update, User):
     message = update.message.text
     messageLower = message.lower()
-    if "skip" in messageLower:
+    if check_for_expected_input(message, botAssets.skip):
         skipResponse(bot, update)
         setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])
     else:
