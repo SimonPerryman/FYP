@@ -15,7 +15,7 @@ def generate_cosine_sim(filmsTable=None):
     if filmsTable is None:
         filmsTable = getFilmTable()
 
-    cv = CountVectorizer(stop_words='english')
+    cv = CountVectorizer()
     cv_matrix = cv.fit_transform(filmsTable['metadata'])
     return cosine_similarity(cv_matrix, cv_matrix)
 

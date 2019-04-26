@@ -209,7 +209,7 @@ def perform_sentiment_analysis(review):
     """Performs sentiment analysis on a user's review,
     classifying it as a positive or negative review"""
     filmClassifier = get_classifier()
-    return filmClassifier.classify(review)
+    return filmClassifier.classify(preprocess_reviews_keep_stop_words(review))
 
 if __name__ == "__main__":
     print(perform_sentiment_analysis("review"))
