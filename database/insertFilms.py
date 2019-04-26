@@ -33,5 +33,6 @@ def construct_films_data():
                             # Film ID       #Title          #TitlePP        #isAdult    #Year           #runTime
                 Films.append((formatted[0].lower(), formatted[2], formatted[9], int(formatted[4]), formatted[5], formatted[7]))
     return Films
+    
 if __name__ == "__main__":
     insertFilmDB(construct_films_data())
