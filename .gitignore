@@ -117,3 +117,6 @@ venv.bak/
 
 # Spacy Models
 spacy_models/*
+
+# Test File
+test.py
