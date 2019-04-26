@@ -20,9 +20,9 @@ def calculate_mood():
   happiness = int(os.environ.get('BOT_HAPPINESS', 0))
   if active_users >= 0.75:
     happiness += 1
-  elif active_users >= 0.25 and active_users <= 0.5:
+  elif active_users >= 0.25 and active_users < 0.5:
     happiness -= 1
-  else:
+  elif active_users < 0.25:
     happiness = 0
 
   os.environ['BOT_HAPPINESS'] = str(happiness)
