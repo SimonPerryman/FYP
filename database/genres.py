@@ -31,8 +31,7 @@ def getAllAlternativeGenreNamesForGenre(GenreID):
     try:
         connection = connect()
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT * FROM `alternativegenrenames` WHERE Genre_ID = %s", (GenreID))
+            cursor.execute("SELECT * FROM `alternativegenrenames` WHERE Genre_ID = %s", (GenreID))
         return cursor.fetchall()
     except Exception as e:
         print("Error getting all alternative names for genre ID: {}".format(

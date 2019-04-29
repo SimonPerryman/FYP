@@ -98,8 +98,9 @@ def create_film_table():
     ratingsTable = pd.DataFrame(db.getAllFilmRatings(), columns=['FilmID', 'Rating', 'NumberOfVotes'])
     ratingsTable[['Rating', 'NumberOfVotes']] = ratingsTable[['Rating', 'NumberOfVotes']].apply(pd.to_numeric)
 
-    # Create the imdb (Weighted Rating) score using the formula ( https://help.imdb.com/article/imdb/track-movies-tv/faq-for-imdb-ratings/G67Y87TFYYP6TWAV )
+    # Create the imdb (Weighted Rating) score using the formula 
     # Weighted Rating = (v / (v + m)) * R + (m / (v + m)) * C
+    # (https://help.imdb.com/article/imdb/track-movies-tv/faq-for-imdb-ratings/G67Y87TFYYP6TWAV)
     C = ratingsTable['Rating'].mean()
     m = 25000
     ratingsTable['imdb_score'] = ratingsTable.apply(lambda x: (

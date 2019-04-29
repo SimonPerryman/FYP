@@ -220,8 +220,8 @@ def extract_film(UserID, message):
   return []
 
 def extract_genres(UserID, message):
-  """Function to call other subfunctions to extract genres, then insert the data
-  into the db.
+  """Function to call other subfunctions to extract genres,
+  then insert the data into the db.
   @param {Int} UserID
   @param {String} message
   @returns {List} Genre names, empty if none found"""
@@ -237,8 +237,8 @@ def extract_genres(UserID, message):
   return []
   
 def extract_crew(UserID, message):
-  """Function to call other subfunctions to extract crew members, then insert the
-  data into the database.
+  """Function to call other subfunctions to extract crew members,
+  then insert the data into the database.
   @param {Int} UserID
   @param {String} message
   @returns {List} Crew Member Names, Empty if none found"""
@@ -496,11 +496,11 @@ def ask_crew_response(bot, message, User):
     db_query = db.getCrewByProcessedName(preprocessed_message)
     if db_query:
       crewInfo = (db_query['CrewID'], db_query['Name'])
-      if crewInfo not in crew:
-        crew.append(crewInfo)
+      if crewInfo[1] not in crew:
+        crew.append(crewInfo[1])
         db.insertQueryInformation(User.id, crew[0], 1)
     if crew:
-      crew_names = format_query_info([crew_member[1] for crew_member in crew])
+      crew_names = format_query_info(crew)
       next_question_message = "So you want {} to have worked on the film?".format(crew_names)
       next_stage = 'ConfirmCrew'
   if not generatedFilm:

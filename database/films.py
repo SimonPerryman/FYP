@@ -14,6 +14,10 @@ def getFilmByID(FilmID):
         connection.close()
 
 def getFilmByProcessedName(Name):
+    """Searches for a film using its processed named.
+    @param {String} Name - Processed Film Name
+    @returns {Dict} Result
+    """
     try:
         connection = connect()
         with connection.cursor() as cursor:
@@ -26,6 +30,10 @@ def getFilmByProcessedName(Name):
         connection.close()
 
 def getFilmBySimilarName(Name):
+    """Searches for an occurence of a film using its processed named.
+    @param {String} Name - Processed Film Name
+    @returns {Dict} Result
+    """
     try:
         connection = connect()
         with connection.cursor() as cursor:
