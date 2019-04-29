@@ -85,5 +85,6 @@ def conversation_handler(bot, update):
     elif User.context == contexts['FilmSuggestion'] or intent == 3:
         FilmSuggestionHandler(bot, update, User)
     else:
-        bot.send_message(chat_id=update.message.chat_id, text="Sorry I don't understand what you said. I currently can suggest films, review films and talk about my day!")
+        bot.send_message(chat_id=update.message.chat_id, text="Sorry I don't understand what you said.")
+        bot.send_message(chat_id=update.message.chat_id, text="I currently can suggest films, review films and talk about my day!")
   

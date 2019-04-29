@@ -14,7 +14,7 @@ def preprocess_string(string):
     are removed.
     @param {String} string
     @returns {String} preprocessed string"""
-    return re.sub(r"[^\s^\d^\w]", "", string.lower()).replace(" ", "")
+    return re.sub(r"[^\d^\w]", "", string.lower())
 
 def preprocess_reviews(review):
     """Preprocesses reviews, removing all stopwords, digits, punctuations and singular letter words

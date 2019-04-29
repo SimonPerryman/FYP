@@ -6,6 +6,7 @@ import logging
 import random
 import os
 from time import time
+import datetime
 
 # Third Party Libraries
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -26,7 +27,7 @@ conversation_handler = MessageHandler(Filters.text, conversations.conversation_h
 def main():
     updater = Updater(token=os.environ['BOT_TOKEN'])
     dispatcher = updater.dispatcher
-    import datetime
+
     # Job Queue
     job_queue = updater.job_queue
     job_queue.run_daily(conversations.ask_for_film_review, datetime.time(9, 0))

@@ -4,7 +4,6 @@ from time import time
 import random
 from database import (getAllGenres, insertFavouriteGenres, setUserContextAndStage, updateUserAge,
                      insertUser, insertMessage, stages, contexts)
-from .errors import errorMessage
 from nlp_techniques import check_for_expected_input
 
 def start(bot, update):
@@ -45,11 +44,16 @@ def registrationComplete(bot, update):
     # TODO Custom Keyboard maybe    
 
 def skipResponse(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="""Sorry, I thought I was being a bit too invasive myself. If you want to tell me your
-                                                            favourite genres olr age later just let me know, but for now I'll just try to figure it out myself haha""",
+    bot.send_message(chat_id=update.message.chat_id, text="Sorry, I thought I was being a bit too invasive myself.")
+    bot.send_message(chat_id=update.message.chat_id, text="If you want to tell me your favourite genres or age later just let me know, but for now I'll just try to figure it out myself haha",
                     reply_markup=telegram.ReplyKeyboardRemove())
 
 def registrationHandler(bot, update, User):
+    """Handler to figure out if the user's message is acceptable, and if so, diverts the user to the correct
+    logic depending on their current stage.
+    @param {Bot} bot
+    @param {update} update
+    @param {Person} User"""
     message = update.message.text
     messageLower = message.lower()
     if check_for_expected_input(message, botAssets.skip):
@@ -87,4 +91,4 @@ def registrationHandler(bot, update, User):
             else:
                 askAgeAgain(bot, update)
         else:
-            errorMessage(bot, update)
+            bot.send_message(chat_id=update.message.chat_id, message="Sorry, I'm not sure I understand.")

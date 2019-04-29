@@ -21,11 +21,11 @@ def construct_films_data():
         for line in f1:
             formatted = line.strip().split('\t')
             if formatted[1] == "movie":
-                if formatted[7] != "\\n":
+                if formatted[7] != "\\N":
                     formatted[7] = int(formatted[7])
                 else:
                     formatted[7] = None
-                if formatted[5] != "\\n":
+                if formatted[5] != "\\N":
                     formatted[5] = int(formatted[5])
                 else:
                     formatted[5] = None

@@ -374,10 +374,10 @@ def confirm_genre_response(bot, message, User):
   db_query = db.getQueryInfo(User.id, 2)
   genre = ''
   if db_query:
-    genre = db_query['Information']
+    genre = [query['Information'] for query in db_query]
   next_question_message = "Sorry I'm not sure I understand."
   if genre:
-    next_question_message = next_question_message + " Did you want the film to be a {}".format(genre)
+    next_question_message = next_question_message + " Did you want the film to be a {}".format(format_query_info(genre))
   next_stage = 'ConfirmGenre'
   skipFlag = False
   if check_for_expected_input(message, skip):
@@ -397,9 +397,9 @@ def confirm_genre_response(bot, message, User):
       next_stage = 'ConfirmCrew'
     else:
       if skipFlag:
-        next_question_message = "Ok let's skip choosing a genre. Are there any people you want to have been involved with them film?"
+        next_question_message = "Ok let's skip choosing a genre. Are there any people you want to have been involved with the film?"
       else:
-        next_question_message = "Right, I'll note that down. Are there any people you want to have been involved with them film?"
+        next_question_message = "Right, I'll note that down. Are there any people you want to have been involved with the film?"
       next_stage = "AskCrew"
   elif check_for_expected_input(message, negatives):
     next_stage = 'AskGenre'

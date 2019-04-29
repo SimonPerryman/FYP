@@ -17,9 +17,10 @@ def check_for_users_with_suggested_films():
     users = db.getAllUsersWithSuggestedFilms()
     users_to_message = []
     for user in users:
-        timeFrame = currentTime - user['SuggestedFilmTime']
+        SuggestedFilmTimeFrame = currentTime - user['SuggestedFilmTime']
+        LastMessageTimeFrame = currentTime - user['LastMessage']
         threshold = 86400 * (user['Asked'] + 1)
-        if timeFrame > threshold and user['LastMessage'] > (threshold - 86400):
+        if SuggestedFilmTimeFrame > threshold and LastMessageTimeFrame > threshold:
             users_to_message.append(user)
 
     db.setAskedCounter([(user['Asked'] + 1, user['UserID']) for user in users_to_message])
@@ -31,7 +32,7 @@ def check_for_users_with_suggested_films():
             user['Stage'],
             user['UserID']
         )
-        for user in users_to_message])
+        for user in users_to_message if user.Context != db.contexts['FilmReview']])
         
     return users_to_message
     
