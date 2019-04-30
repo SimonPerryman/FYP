@@ -95,7 +95,7 @@ def GiveReviewResponse(bot, message, User):
     db.insertReview(User.id, User.suggested_film, message, 1 if sentiment[0] == "pos" else 0, sentiment[1])
     bot.send_message(User.id, "Thanks for leaving your review! I have noted it down.")
     bot.send_message(User.id, "Could you also score the film out of 5? 1 being poor and 5 being excellent.",
-                    reply_markup=telegram.ReplyKeyboardMarkup(scoreKeyboard))
+                    reply_markup=telegram.ReplyKeyboardMarkup(keyboard=scoreKeyboard(), resize_keyboard=True))
     setUserContextAndStage(User.id, contexts['FilmReview'], stages['filmReview'][next_stage])
 
 def ConfirmNoReviewResponse(bot, message, User):
