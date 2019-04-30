@@ -23,7 +23,7 @@ def remove_duplicate_crew_members(film):
     new_crew = [crew_member for crew_member in new_crew if crew_member not in film['Writers']]
     return new_crew
 
-def create_metadata(film, dtype):
+def create_metadata(film):
     """Creates the metadata field, made up of the genre names, writers, directors and crew id's.
     @param {Pandas DataFrame}  film - one row from the pandas dataframe, including information about the film
     @returns {String} metadata"""
