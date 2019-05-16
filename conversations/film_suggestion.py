@@ -531,7 +531,7 @@ def cancel_film_suggestion(bot, User):
   """Gets the user out of the film suggestion conversation
   @param {Bot} bot
   @param {Person} User"""
-  db.updateSuggestedFilmStatus(User.id, 1)
+  db.updateSuggestedFilmStatus(User.id, 0)
   db.updateSuggestedFilmIndex(User.id, 0)
   db.removeQueryInfo(User.id)
   setUserContextAndStage(User.id, contexts['ChitChat'], stages['ChitChat'])

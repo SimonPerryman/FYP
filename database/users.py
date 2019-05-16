@@ -89,10 +89,10 @@ def updateSuggestedFilmStatus(UserID, Status):
         connection = connect()
         with connection.cursor() as cursor:
             if Status == 1:
-                cursor.execute("""UPDATE `users` SET SuggestedFilmStatus = %s, SuggestedFilmTime = %s
-                            WHERE UserID = %s""", (Status, time(), UserID))
+                cursor.execute("""UPDATE `users` SET SuggestedFilmStatus = %s, SuggestedFilmTime = %s, Asked = %s
+                            WHERE UserID = %s""", (Status, time(), 0, UserID))
             else:
-                cursor.execute("""UPDATE `users` SET SuggestedFilmStatus = %s WHERE UserID = %s""", (Status, UserID))
+                cursor.execute("""UPDATE `users` SET SuggestedFilmStatus = %s, Asked = %s WHERE UserID = %s""", (Status, 0, UserID))
 
         connection.commit()
     except Exception as e:

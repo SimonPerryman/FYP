@@ -7,7 +7,7 @@ import database as db
 def check_film_table_exists():
     """Checks if the file exists in the system
     @returns {Boolean} True if found, False if not."""
-    return os.path.isfile("{}\{}".format(os.environ['PICKLE_DIRECTORY'], 'filmsTable.pkl'))
+    return os.path.isfile("{}/{}".format(os.environ['PICKLE_DIRECTORY'], 'filmsTable.pkl'))
 
 def sanitise_genres(genres):
     """Returns a list of genres, removing any null (None) values.
@@ -116,7 +116,7 @@ def create_film_table():
     print("Created metadata data")
 
     print("Saving filmsTable as pickle file")
-    filmsTable.to_pickle("{}\{}".format(os.environ['PICKLE_DIRECTORY'],'filmsTable.pkl'))
+    filmsTable.to_pickle("{}/{}".format(os.environ['PICKLE_DIRECTORY'],'filmsTable.pkl'))
     return filmsTable
 
 def getFilmTable():
@@ -124,7 +124,7 @@ def getFilmTable():
     @returns {Pandas DataFrame} filmsTable"""
     if check_film_table_exists():
         print('Table found, using pickle file')
-        return pd.read_pickle('filmsTable.pkl')
+        return pd.read_pickle("{}/{}".format(os.environ['PICKLE_DIRECTORY'],'filmsTable.pkl'))
     print('Table not found, creating new table.')
     return create_film_table()
 

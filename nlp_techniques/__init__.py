@@ -1,3 +1,3 @@
 from .preprocessing import lemmatize_sentence, preprocess_string
-from .sentiment_analysis import *
+from .sentiment_analysis import perform_sentiment_analysis, Classifier
 from .check_for_expected_input import check_for_expected_input

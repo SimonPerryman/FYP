@@ -3,7 +3,7 @@ import botAssets
 from time import time
 import random
 from database import (getAllGenres, insertFavouriteGenres, setUserContextAndStage, updateUserAge,
-                     insertUser, insertMessage, stages, contexts)
+                     insertUser, insertMessage, stages, contexts, getSpecificFavouriteGenre)
 from nlp_techniques import check_for_expected_input
 
 def start(bot, update):
@@ -27,7 +27,8 @@ def askThirdFavouriteGenre(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Sweet. What's your third favourite genre?! If I had to guess I'd say you like horror films!")
 
 def askAge(bot, update, User):
-    bot.send_message(chat_id=update.message.chat_id, text="Nice. I like also like {}! I guess I just love all types of films!".format(User.thirdFavouriteGenre))
+    thirdFavouriteGenre = getSpecificFavouriteGenre(User.id, 3).get('Name')
+    bot.send_message(chat_id=update.message.chat_id, text="Nice. I like also like {} films! I guess I just love all types of films!".format(thirdFavouriteGenre))
     bot.send_message(chat_id=update.message.chat_id, text="It's my birthday tomorrow. I'm going to be 22. How old are you?",
                     reply_markup=telegram.ReplyKeyboardRemove())
 

@@ -117,14 +117,15 @@ def getFavouriteGenres(UserID):
     finally:
         connection.close()
 
-def getSpecificFavouriteGenre(UserID, Position):
+def getSpecificFavouriteGenre(UserID, Order):
     try:
-        if Position > 0 and Position < 4:
+        if Order > 0 and Order < 4:
             connection = connect()
             # Check does not already exist
             with connection.cursor() as cursor:
-                cursor.execute("""SELECT * FROM favouritegenres WHERE UserID = %s
-                AND Position = %s""", (UserID, Position))
+                cursor.execute("""SELECT * FROM favouritegenres LEFT JOIN genreslist on 
+                favouritegenres.GenreID = genreslist.GenreID WHERE UserID = %s AND `Order` = %s""",
+                (UserID, Order))
             
             return cursor.fetchone()
         else:

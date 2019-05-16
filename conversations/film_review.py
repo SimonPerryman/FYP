@@ -32,7 +32,7 @@ def check_for_users_with_suggested_films():
             user['Stage'],
             user['UserID']
         )
-        for user in users_to_message if user.Context != db.contexts['FilmReview']])
+        for user in users_to_message if user['Context'] != db.contexts['FilmReview']])
         
     return users_to_message
     
@@ -52,7 +52,7 @@ def AskIfWatchedResponse(bot, message, User):
     @param {Bot} bot
     @param {String} message
     @param {Person} User"""
-    next_stage = 'AskIfWatchedResponse'
+    next_stage = 'AskIfWatched'
     next_message = ""
     next_context = "FilmReview"
     if check_for_expected_input(message, positives):
@@ -73,7 +73,7 @@ def AskReviewResponse(bot, message, User):
     @param {Bot} bot
     @param {String} message
     @param {Person} User"""
-    next_stage = "AskReviewResponse"
+    next_stage = "AskReview"
     next_message = "Sorry I'm not sure I understand what you said."
     if check_for_expected_input(message, positives):
         next_message = "Ok, what is your review?"
@@ -130,6 +130,8 @@ def ScoreFilmResponse(bot, message, User):
     next_context = contexts['FilmReview']
     try:
         score = round(float(message))
+        if score < 1 or score > 5:
+            raise Exception("Score not between 1 and 5")
         liked = db.getReview(User.id, User.suggested_film)['Pos']
         db.insertUserRating(User.id, User.suggested_film, liked, score)
         db.removeSuggestedFilm(User.id)

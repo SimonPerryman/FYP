@@ -59,7 +59,7 @@ def collaborative_recommender():
     """Checks if there is an algorithm object pickle file in memory, if so returns it, else builds a
     collaborative recommendation algorithm object and returns that.
     @returns {Algorithm Object} algorithm"""
-    if os.path.isfile("{}\{}".format(os.environ['PICKLE_DIRECTORY'], 'collaborative.pkl')):
+    if os.path.isfile("{}/{}".format(os.environ['PICKLE_DIRECTORY'], 'collaborative.pkl')):
         return get_collaborative_recommender()
     else:
         return build_collaborative_recommender()
