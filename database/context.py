@@ -1,5 +1,3 @@
-#TODO Fill this out
-# Previous Context
 contexts = {
     "Error": 0,
     "InitialUserRegistration": 1,

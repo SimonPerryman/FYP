@@ -1,3 +1,9 @@
+"""
+
+MovieLens user ratings data insertion file
+
+"""
+
 from .db_connection import connect
 import films
 import pandas as pd

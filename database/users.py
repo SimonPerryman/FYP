@@ -1,3 +1,11 @@
+"""
+
+Users database file
+
+All functions related to the user table
+
+"""
+
 from time import time
 
 from .db_connection import connect

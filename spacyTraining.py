@@ -1,4 +1,9 @@
-# FILE TO TRAIN SPACY DATA SET TO ADD ALL FILMS AND CREW MEMEBERS THAT ARE IN THE DATABASE
+"""
+SpaCy model training file
+
+Training was not successful in the past, however with some tinkering could improve.
+Uses film and crew member information from the database.
+"""
 
 from random import shuffle
 from database import getAllCrewMembersNames, getAllFilms

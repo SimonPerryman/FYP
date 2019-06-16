@@ -1,3 +1,12 @@
+"""
+
+Conversations handler file
+
+Identification file for the user's input message - attempting to identify the intent and context of a message.
+User is then routed to a difference conversation file's handler depending on intent and context.
+
+"""
+
 from time import time
 from .chitchat import moodMessage, greetingsMessage
 from .registration import registrationHandler

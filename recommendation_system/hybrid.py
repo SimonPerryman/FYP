@@ -1,3 +1,7 @@
+"""
+Hybrid recommender file
+"""
+
 from .collaborative import collaborative_recommender
 from .content import content_recommender
 from .create_table import getFilmTable

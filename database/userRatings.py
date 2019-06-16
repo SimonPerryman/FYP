@@ -1,3 +1,11 @@
+"""
+
+User ratings database file
+
+All functions to do with the user ratings and MovieLens user ratings tables
+
+"""
+
 from .db_connection import connect
 
 def insertMultipleUserRatings(ratings):

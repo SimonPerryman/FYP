@@ -1,3 +1,9 @@
+"""
+
+Ratings data insertion file
+
+"""
+
 from db_connection import connect
 
 def insertRatingsDB(Ratings):

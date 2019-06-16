@@ -1,3 +1,9 @@
+"""
+Environment Variables File
+
+Adds environment variables on startup.
+"""
+
 import os
 
 def add_environment_variables():

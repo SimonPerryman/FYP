@@ -1,3 +1,11 @@
+"""
+
+Registation Conversation File
+
+All conversational logic for registration with the system
+
+"""
+
 import telegram
 import botAssets
 from time import time

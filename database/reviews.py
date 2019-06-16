@@ -1,3 +1,12 @@
+"""
+
+Reviews database file
+
+All functions to do with the reviews table
+
+"""
+
+
 from .db_connection import connect
 
 def insertReview(UserID, FilmID, Review, Pos, Score):

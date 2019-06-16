@@ -1,3 +1,9 @@
+"""
+
+IMDB films data insertion file
+
+"""
+
 from .db_connection import connect
 from nlp_techniques import preprocess_string
 

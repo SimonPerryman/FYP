@@ -1,3 +1,12 @@
+"""
+
+Keyboards file
+
+Custom keyboards made using the telegram bot library
+to be used in the conversation to improve the flow.
+
+"""
+
 from database import getAllGenres
 
 def genresKeyboard():

@@ -1,3 +1,11 @@
+"""
+
+Films database file
+
+All functions to do with the films and alternative films tables
+
+"""
+
 from .db_connection import connect
 
 def getFilmByID(FilmID):

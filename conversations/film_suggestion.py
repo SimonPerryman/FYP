@@ -1,3 +1,11 @@
+"""
+
+Film Suggestion Conversation File
+
+All conversational logic for the film recommendation journey
+
+"""
+
 import spacy
 import re
 import database as db

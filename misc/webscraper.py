@@ -1,3 +1,15 @@
+"""
+
+Webscraping file
+
+File to webscrape data
+
+Currently used to get the film poster and blurb
+
+#TODO Fix some of the blurbs as they include the "Read more" as the text gets cut off
+
+"""
+
 # Code from https://realpython.com/python-web-scraping-practical-introduction/
 from requests import get
 from requests.exceptions import RequestException

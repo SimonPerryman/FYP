@@ -1,3 +1,7 @@
+"""
+Content Recommender File
+"""
+
 import pandas as pd
 from misc import load_pickle
 from .create_table import getFilmTable

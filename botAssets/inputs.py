@@ -1,3 +1,15 @@
+"""
+
+Inputs file
+
+Predefined expected inputs, used for the "check for expected input" functionality
+to predict whether a user is using a synonym of a word or phrase.
+
+All expected inputs have been passed through the lemmatize_sentence function in
+the nlp_techniques/preprocessing.py file.
+
+"""
+
 greetings = [
     "hi",
     "hello",

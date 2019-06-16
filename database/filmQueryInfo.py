@@ -1,3 +1,12 @@
+"""
+
+Film Query Information database file
+
+All functions to do with the filmsuggestionqueryinfo table
+
+"""
+
+
 from .db_connection import connect
 
 def insertQueryInformation(UserID, Information, Type):

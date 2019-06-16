@@ -1,3 +1,9 @@
+"""
+
+Database connection file
+
+"""
+
 import pymysql
 import os
 

@@ -1,3 +1,9 @@
+"""
+
+Crew data insertion file
+
+"""
+
 from .db_connection import connect
 from .crew import getRole
 from nlp_techniques import preprocess_string

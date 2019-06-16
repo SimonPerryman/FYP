@@ -1,3 +1,11 @@
+"""
+
+Text preprcoessing functions file
+
+Review preprocessing has the option of keeping stopwords and removing them
+
+"""
+
 import re
 import spacy
 nlp = spacy.load('en_core_web_sm')

@@ -1,3 +1,12 @@
+"""
+
+Mood file
+
+File for getting and setting the chatbots mood.
+
+"""
+
+
 import os
 import sys
 from time import time

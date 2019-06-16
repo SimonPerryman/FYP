@@ -1,3 +1,9 @@
+"""
+
+Film and Crew data insertion file
+
+"""
+
 from .crew import getRole
 from .db_connection import connect
 principals = r'D:\dev\Dataset\title.principals.tsv\data.tsv'

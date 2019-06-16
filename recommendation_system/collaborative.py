@@ -1,3 +1,7 @@
+"""
+Collaborative Recommender File
+"""
+
 from surprise import SVD, KNNBasic, Dataset, Reader
 from surprise.model_selection import cross_validate
 import os

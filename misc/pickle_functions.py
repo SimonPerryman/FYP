@@ -1,3 +1,11 @@
+"""
+
+Pickle functions file
+
+Functions for abstracting the pickle functionality.
+
+"""
+
 import pickle
 import os
 

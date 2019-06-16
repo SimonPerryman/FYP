@@ -1,3 +1,9 @@
+"""
+
+Genres database file
+
+"""
+
 from .db_connection import connect
 
 def getGenre(GenreName):

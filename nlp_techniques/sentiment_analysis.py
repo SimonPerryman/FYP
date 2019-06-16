@@ -1,3 +1,16 @@
+"""
+
+Sentiment analysis classifier file
+
+Built for the film reviews, could be used for other sentiment analysis,
+as long as the training data was effective and the classifier was saved
+as a pickle file with a different name.
+
+Accuracy needs to be improved
+
+"""
+
+
 from nltk.corpus import movie_reviews
 from random import shuffle
 from .preprocessing import preprocess_reviews, preprocess_reviews_keep_stop_words

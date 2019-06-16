@@ -1,3 +1,11 @@
+"""
+Commands file
+
+Command currently broken/not implemented.
+
+Can specificy whether it's an admin command or not by checking if the user has a specific ID (admin ID) - not implemented
+"""
+
 import database
 
 def isGenre(query):

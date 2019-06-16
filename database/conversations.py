@@ -1,3 +1,11 @@
+"""
+
+Conversations database file
+
+All functions to do with the conversations and messages tables
+
+"""
+
 from .db_connection import connect
 
 def getUserLatestConversationID(UserID):

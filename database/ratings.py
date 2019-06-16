@@ -1,3 +1,10 @@
+"""
+
+Ratings database file
+
+All functions to do with the ratings table
+
+"""
 from .db_connection import connect
 
 def getFilmRating(FilmID):

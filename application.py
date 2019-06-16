@@ -1,3 +1,4 @@
+# Environment Variables upon startup
 from environment_variables import add_environment_variables
 add_environment_variables()
 

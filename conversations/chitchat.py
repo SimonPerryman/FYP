@@ -1,3 +1,13 @@
+"""
+
+Chitchat conversations file
+
+File for the general conversations.
+
+This would be where the input of the Sequence2Sequence model would go
+
+"""
+
 from random import randint
 import botAssets
 

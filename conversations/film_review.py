@@ -1,3 +1,11 @@
+"""
+
+Film Review Conversation File
+
+All conversational logic for the film review with the system
+
+"""
+
 import sys
 import os
 from time import time
