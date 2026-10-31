@@ -19,7 +19,7 @@ def connect():
                              cursorclass = pymysql.cursors.DictCursor)
     return pymysql.connect(host="localhost",
                             user="root",
-                            password="5q%C270r$xi5cay*c21Gz^5Ss",
+                            password=os.environ['LOCAL_DB_PASSWORD'],
                             db="filmio",
                             charset="utf8",
                             cursorclass=pymysql.cursors.DictCursor)

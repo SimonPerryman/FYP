@@ -16,3 +16,9 @@ Python 3.6 must be installed.
 
 ## Instructions
 In the root directory, run the application.py file
+
+When running locally (no `RDS_HOSTNAME` set), the app connects to a MySQL database `filmio` on `localhost` as `root`. Set the password in the environment first:
+
+`export LOCAL_DB_PASSWORD=<your local MySQL root password>`
+
+The Telegram bot token is read from `BOT_TOKEN`.
